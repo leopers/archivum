@@ -4,19 +4,19 @@ description: "How Banach's fixed-point theorem explains Picard's method of succe
 published: 2026-08-18
 topics: [Ordinary Differential Equations, Analysis, Fixed-Point Theory]
 draft: false
-status: under-construction
+status: complete
 featured: true
 ---
 
 ## Motivation
 
-In many undergraduate ODE courses taught in Brazil, existence and uniqueness are presented more as facts than as results to be understood. Picard’s method of successive approximations is introduced, a sequence of inequalities is given, and convergence to a unique solution is asserted. The mechanism connecting these steps often remains unclear.
+In many undergraduate ODE courses taught in Brazil, existence and uniqueness are presented more as facts than as results to be understood. Picard’s method of successive approximations is introduced, followed by a sequence of inequalities and the assertion that the approximations converge to a unique solution. What connects these steps is often left implicit.
 
-This was how I first encountered the Cauchy–Lipschitz theorem. Picard’s method seemed like a construction specific to differential equations, and the reason it established both existence and uniqueness was hidden inside the calculations.
+This was how I first encountered the Cauchy–Lipschitz theorem. Picard’s method seemed like a construction devised specifically for differential equations, while the reason it proved both existence and uniqueness remained hidden inside the calculations.
 
 In France, I learned a different presentation. One first proves Banach’s fixed-point theorem. The Cauchy problem is then rewritten as an integral equation, which defines a map on a complete space of functions. Its fixed point is precisely a solution of the ODE.
 
-From this viewpoint, Picard’s method is the method of successive approximations applied to a contracting map. This article develops that argument from the metric-space foundations to the local Cauchy–Lipschitz theorem.
+From this viewpoint, Picard’s method is simply the method of successive approximations applied to a contracting map. The aim of this article is to make that argument explicit, beginning with the necessary metric-space foundations and ending with the local Cauchy–Lipschitz theorem.
 
 ## The initial-value problem
 
@@ -58,7 +58,7 @@ The interval $J$ is part of the solution. We initially ask two distinct question
 
 The Cauchy–Lipschitz theorem gives conditions on $f$ that answer both questions locally, on an interval around $t_0$.
 
-Notice that neither question asks us to find a closed formula for the solution. Before solving an equation explicitly, we want to know whether there is in fact a well-defined object to find. This is the point at which the problem leaves elementary calculation and becomes a question in analysis.
+Neither question asks for a closed formula. Before trying to calculate a solution, we must know that there is a well-defined solution to calculate. This is where the problem becomes one of analysis rather than symbolic manipulation.
 
 ### From the differential equation to an integral equation
 
@@ -93,7 +93,7 @@ $$
 
 and evaluation at $t=t_0$ gives $x(t_0)=x_0$.
 
-This equivalence is the decisive change of viewpoint. Differentiation is replaced by integration, and the unknown curve now appears as the input of a map acting on functions.
+This equivalence is the key change of viewpoint. After replacing differentiation by integration, the unknown curve can be treated as the input of a map acting on functions.
 
 The integral formulation reveals the fixed-point structure. Define the Picard map $\Phi$ by
 
@@ -109,11 +109,11 @@ $$
 \Phi(x)=x.
 $$
 
-It remains to choose a complete function space on which $\Phi$ is contracting.
+The problem is now to choose a complete function space on which $\Phi$ is contracting.
 
 ## Metric and complete spaces
 
-The map $\Phi$ acts on functions. To speak meaningfully about successive approximations, we need to measure the distance between two functions. We also need to know that, if these approximations approach one another, their limit is still an admissible function. Metric spaces and completeness formalize these two requirements.
+Because $\Phi$ acts on functions, we need a way to measure the distance between two functions. We must also ensure that when successive approximations approach one another, their limit remains in the space under consideration. These are exactly the roles of a metric and completeness.
 
 ### Distances and metric spaces
 
@@ -253,7 +253,7 @@ $$
 
 Thus $y_n\to y$ uniformly on $J$. A uniform limit of continuous functions is continuous, so $y\in C(J;\mathbb{R}^n)$. Therefore the space is complete.
 
-We have now identified a setting in which a convergent construction cannot leave the space of continuous functions. The remaining ingredient is a map that forces successive approximations to approach one another.
+Completeness keeps the limit inside the space of continuous functions. We now need a map that forces the successive approximations to approach one another.
 
 ## Contractions and Banach’s fixed-point theorem
 
@@ -385,7 +385,7 @@ $$
 
 Since $k<1$, necessarily $d(x,y)=0$, hence $x=y$.
 
-The proof contains the complete mechanism we need for the ODE. Contraction makes the successive approximations Cauchy, completeness supplies their limit, and continuity identifies that limit as a fixed point. The contraction inequality then gives uniqueness.
+This is the mechanism we will use for the ODE: contraction makes the successive approximations Cauchy, completeness supplies their limit, and continuity identifies that limit as a fixed point. The same contraction inequality gives uniqueness.
 
 ## A precise local existence and uniqueness theorem
 
@@ -562,7 +562,7 @@ $$
 
 Thus $\Phi$ is a contracting map on the nonempty complete metric space $(E,d_\infty)$.
 
-All hypotheses of Banach’s theorem have now been verified. The abstract fixed point will become the desired solution through the integral formulation.
+All the hypotheses of Banach’s theorem are now verified. Through the integral formulation, its fixed point will be the desired solution.
 
 ### Conclusion of the proof
 
@@ -585,7 +585,7 @@ $$
 
 By the integral formulation lemma, $x\in C^1(J;\mathbb{R}^n)$ solves the Cauchy problem. The uniqueness of the fixed point gives uniqueness among solutions whose graphs remain in $A$ on $J$.
 
-Picard’s successive approximations are therefore not an additional argument appended to the theorem. They are exactly the successive approximations in Banach’s proof, now performed in the function space $E$.
+Picard’s successive approximations are therefore not an additional argument attached to the theorem. They are the successive approximations from Banach’s proof, now carried out in the function space $E$.
 
 ## The Cauchy–Lipschitz theorem for a $C^1$ vector field
 
@@ -744,3 +744,30 @@ $$
 If $\gamma<b$, continuity of $\widetilde x$ would imply that $\widetilde x(t)$ remains in $\overline B(x_0,\delta)$ for times slightly larger than $\gamma$, contradicting the definition of $\gamma$. Hence $\gamma=b$, and the two solutions coincide on $[t_0,b]$. The same argument shows that they coincide on $[a,t_0]$. Since $[a,b]\subseteq\widetilde J$ was arbitrary, they coincide on all of $\widetilde J$.
 
 Thus a $C^1$ vector field determines a unique local solution through every initial condition. The conclusion is local because the construction only uses a compact neighborhood of $(t_0,x_0)$; extending the solution beyond this neighborhood is a separate question.
+
+## Conclusion
+
+We began with a question that Picard’s method, when presented only as a sequence of estimates, does not fully answer: why does the iteration produce a solution, and why can there be only one? Banach’s fixed-point theorem reveals that these are two parts of the same argument.
+
+The differential equation is first rewritten as the integral equation
+
+$$
+x(t)
+=
+x_0+
+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+This formula defines the Picard map $\Phi$ on a complete metric space of continuous functions. The bound on $f$ keeps its images inside the chosen space, while the Lipschitz condition with respect to the state variable makes it contracting. Banach’s theorem then supplies a unique fixed point, which is precisely the solution of the Cauchy problem.
+
+Picard’s successive approximations
+
+$$
+y_{n+1}=\Phi(y_n)
+$$
+
+are not a separate trick. They are the constructive part of Banach’s theorem. The contraction makes the approximations converge, completeness keeps their limit in the function space, and the integral formulation turns that fixed point back into a solution of the differential equation.
+
+The theorem is local. It guarantees a unique solution near the initial time, but it does not determine how far that solution can be extended or what may obstruct global existence. Those questions belong to the theory of maximal solutions and continuation.
+
+For the local problem, however, the apparent mystery is gone. Picard’s method works because it is Banach’s method of successive approximations in a carefully chosen function space. Existence and uniqueness are not separate conclusions reached by unrelated calculations; they are consequences of the same fixed-point principle.
