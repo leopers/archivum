@@ -1,0 +1,152 @@
+---
+interface Props {
+  locale?: "en" | "fr";
+}
+
+const { locale = "en" } = Astro.props;
+const copy =
+  locale === "fr"
+    ? {
+        demo: "Démonstration du suivi",
+        demoCaption:
+          "La détection YOLOv8 alimente le filtre de Kalman. Lorsque le marqueur disparaît, la prédiction continue à fournir une estimation de sa position.",
+        raw: "détection YOLO",
+        predicted: "prédiction",
+        corrected: "estimation corrigée",
+        training:
+          "Évolution de l’entraînement sur 25 époques : pertes, précision, rappel et mAP.",
+        matrix: "Matrice de confusion normalisée du détecteur à une classe.",
+      }
+    : {
+        demo: "Tracking demonstration",
+        demoCaption:
+          "YOLOv8 detections feed the Kalman filter. When the marker disappears, the prediction continues to estimate its position.",
+        raw: "YOLO detection",
+        predicted: "prediction",
+        corrected: "corrected estimate",
+        training:
+          "Training history over 25 epochs: losses, precision, recall, and mAP.",
+        matrix: "Normalized confusion matrix for the single-class detector.",
+      };
+---
+
+<figure class="demo-figure">
+  <div class="demo-heading">
+    <span>{copy.demo}</span>
+    <div class="legend" aria-label="Tracking legend">
+      <span><i class="raw"></i>{copy.raw}</span>
+      <span><i class="predicted"></i>{copy.predicted}</span>
+      <span><i class="corrected"></i>{copy.corrected}</span>
+    </div>
+  </div>
+  <video
+    controls
+    playsinline
+    preload="metadata"
+    poster="/projects/yolov8-kalman-uav/tracking-demo-poster.jpg"
+  >
+    <source
+      src="/projects/yolov8-kalman-uav/tracking-demo.mp4"
+      type="video/mp4"
+    />
+  </video>
+  <figcaption>{copy.demoCaption}</figcaption>
+</figure>
+
+<div class="result-grid">
+  <figure>
+    <img
+      src="/projects/yolov8-kalman-uav/training-results.png"
+      alt={copy.training}
+      loading="lazy"
+    />
+    <figcaption>{copy.training}</figcaption>
+  </figure>
+  <figure>
+    <img
+      src="/projects/yolov8-kalman-uav/confusion-matrix.png"
+      alt={copy.matrix}
+      loading="lazy"
+    />
+    <figcaption>{copy.matrix}</figcaption>
+  </figure>
+</div>
+
+<style>
+  .demo-figure,
+  .result-grid figure {
+    margin: 2.4rem 0;
+  }
+  .demo-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .legend i {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .raw {
+    color: #b84b42;
+  }
+  .predicted {
+    color: #365f9e;
+  }
+  .corrected {
+    color: #24231f;
+  }
+  video,
+  .result-grid img {
+    display: block;
+    width: 100%;
+    background: #171815;
+    border: 1px solid var(--border);
+  }
+  figcaption {
+    margin-top: 0.65rem;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 0.76rem;
+    line-height: 1.5;
+  }
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .result-grid figure {
+    margin: 0;
+  }
+  @media (max-width: 720px) {
+    .demo-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

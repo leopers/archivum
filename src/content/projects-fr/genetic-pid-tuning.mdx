@@ -1,0 +1,128 @@
+---
+title: "Réglage génétique d’un PID"
+description: "Une comparaison contrôlée entre recherche génétique et règle de Ziegler–Nichols pour régler un correcteur PID."
+year: 2024
+topics: [Automatique, Optimisation, Calcul évolutionnaire]
+status: complete
+featured: true
+repo: "https://github.com/leopers/genetic-PID-tunning"
+---
+
+import PIDTuningResults from "../../components/PIDTuningResults.astro";
+
+Ce projet, réalisé à l’ITA avec André Thiessen et José Ronaldo, pose une question précise de synthèse : que change le fait de traiter les gains PID comme un problème d’optimisation plutôt que de les obtenir par une règle empirique ?
+
+Les deux méthodes sont implémentées en Python et comparées sur la réponse indicielle en boucle fermée d’une même plante du troisième ordre. Ziegler–Nichols fournit une référence déterministe issue de la limite de stabilité ; l’algorithme génétique cherche directement les gains favorisant les critères temporels choisis.
+
+## Système contrôlé
+
+La plante en boucle ouverte et le correcteur PID parallèle sont
+
+$$
+G(s)=\frac{20}{s^3+32s^2+140s},
+\qquad
+C(s)=K_p+\frac{K_i}{s}+K_ds
+\tag{1}
+$$
+
+Avec un retour unitaire négatif, chaque triplet de gains est évalué sur
+
+$$
+T(s)=\frac{C(s)G(s)}{1+C(s)G(s)}
+\tag{2}
+$$
+
+```python
+tf_sys = TransferFunction([20], [1, 32, 140, 0])
+tf_pid = TransferFunction([kd, kp, ki], [1, 0])
+closed_loop = (tf_sys * tf_pid).feedback()
+```
+
+## Référence de Ziegler–Nichols
+
+La méthode du gain ultime supprime d’abord les actions intégrale et dérivée, puis augmente le gain proportionnel jusqu’aux oscillations entretenues. Le polynôme caractéristique donne ici
+
+$$
+\omega_u=\sqrt{140}\approx11{,}83\ \mathrm{rad\,s^{-1}},
+\qquad K_u=224,
+\qquad T_u=\frac{2\pi}{\omega_u}
+\tag{3}
+$$
+
+La règle PID classique fixe ensuite
+
+$$
+K_p=0{,}6K_u,
+\qquad
+K_i=\frac{K_p}{T_u/2},
+\qquad
+K_d=K_p\frac{T_u}{8}
+\tag{4}
+$$
+
+et produit $(K_p,K_i,K_d)=(134{,}400,505{,}733,8{,}929)$. Le calcul est rapide, mais la réponse obtenue est agressive et présente un fort dépassement initial.
+
+## Représentation génétique des gains
+
+Chaque gain est codé sur cinq bits ; un chromosome contient donc 15 bits :
+
+$$
+\chi=\left[\chi_p\mid\chi_i\mid\chi_d\right]\in\{0,1\}^{15}
+\tag{5}
+$$
+
+Chaque bloc est projeté sur $[0,100]$ selon
+
+$$
+K_j=100\frac{\operatorname{int}(\chi_j)}{2^5-1},
+\qquad j\in\{p,i,d\}
+\tag{6}
+$$
+
+Il n’existe ainsi que 32 valeurs possibles par gain, espacées de $100/31\approx3{,}2258$. Les gains finaux — $67{,}742$, $3{,}226$ et $32{,}258$ — appartiennent exactement à cette grille. Le codage définit donc aussi la résolution de la recherche.
+
+```python
+value = np.dot(bits, [2 ** (n_bit - j - 1) for j in range(n_bit)])
+value /= (2**n_bit) - 1
+gain = lower_bound + (upper_bound - lower_bound) * value
+```
+
+La population initiale contient 100 candidats aléatoires. À chaque génération, les deux meilleurs sont sélectionnés, la première moitié de leurs chromosomes est échangée, les bits sont mutés indépendamment, puis les deux enfants remplacent les individus les moins aptes. La recherche s’arrête lorsque la meilleure fitness dépasse 83.
+
+## Fonction objectif
+
+Quatre grandeurs sont extraites de la réponse indicielle : temps de montée $t_r$, valeur finale $y_\infty$, dépassement $M_p$ et temps d’établissement $t_s$. Le score implémenté est
+
+$$
+J=\frac{1}{4}\left(
+\frac{100}{t_r+1}
++\frac{100}{y_\infty+0{,}1}
++\frac{100}{M_p+1}
++\phi(t_s)
+\right)
+\tag{7}
+$$
+
+avec $\phi(t_s)=100$ si $t_s\leq10$ et $100/(t_s+0{,}01)$ sinon. Une fitness élevée est préférable. Cette fonction favorise fortement une montée rapide et un faible dépassement, tout en considérant identiques tous les temps d’établissement inférieurs à dix secondes.
+
+Un détail mérite d’être explicité : le second terme emploie la valeur finale de sortie, bien qu’il soit nommé erreur statique. Pour un échelon unitaire, il faudrait utiliser $e_{ss}=|1-y_\infty|$. Les deux contrôleurs atteignent ici la valeur un, mais cette correction rendrait l’objectif cohérent pour d’autres résultats.
+
+## Résultats
+
+<PIDTuningResults locale="fr" />
+
+Le correcteur trouvé par l’algorithme génétique atteint environ $1{,}03\%$ de dépassement, contre $61{,}81\%$ pour Ziegler–Nichols. Le temps d’établissement passe également de $1{,}90$ s à $0{,}92$ s, et les deux réponses convergent vers la consigne unitaire.
+
+Pour cette plante et cet objectif, la recherche numérique trouve donc un correcteur moins oscillatoire que la référence empirique. Cela ne signifie pas que le réglage génétique est toujours supérieur : Ziegler–Nichols vise un réglage initial peu coûteux, tandis que l’algorithme génétique simule la plante pendant des centaines de générations et est jugé par la fonction qu’il optimise.
+
+## Limites et prolongements
+
+Le résultat provient d’une seule exécution stochastique, d’une seule plante et d’un codage fixe. L’algorithme emploie une probabilité de mutation par bit très élevée, sélectionne toujours les deux meilleurs parents et ne mesure pas la variance entre plusieurs exécutions. L’objectif ne pénalise ni l’effort de commande ni la saturation des actionneurs.
+
+Une étude plus robuste répéterait la recherche pour plusieurs graines aléatoires, réserverait des plantes ou perturbations inédites à la validation et inclurait des optimiseurs déterministes modernes. Un critère ITAE complété par des pénalités de dépassement, d’énergie de commande et de marge de robustesse correspondrait mieux aux contraintes d’ingénierie. Un codage réel ou une optimisation locale finale supprimerait enfin la quantification due aux cinq bits.
+
+## Références
+
+1. J. G. Ziegler et N. B. Nichols, « [Optimum Settings for Automatic Controllers](https://doi.org/10.1115/1.2899060) », _Transactions of the ASME_, vol. 64, p. 759–768, 1942.
+2. J. H. Holland, _Adaptation in Natural and Artificial Systems_, University of Michigan Press, 1975.
+3. K. J. Åström et T. Hägglund, _Advanced PID Control_, ISA, 2006.
