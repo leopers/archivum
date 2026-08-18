@@ -1,6 +1,6 @@
 ---
-title: "Encontrando soluções de EDOs por pontos fixos"
-description: "Como o teorema do ponto fixo de Banach esclarece o método das aproximações sucessivas e o teorema de Cauchy–Lipschitz."
+title: "Procurando soluções de EDOs por pontos fixos"
+description: "Como o teorema do ponto fixo de Banach esclarece o método das aproximações sucessivas de Picard e o teorema de Cauchy–Lipschitz."
 published: 2026-08-18
 topics: [Equações Diferenciais Ordinárias, Análise, Teorema do Ponto Fixo]
 draft: false
@@ -10,11 +10,11 @@ featured: true
 
 ## Motivação
 
-Em muitos cursos de Equações Diferenciais Ordinárias no Brasil, existência e unicidade aparecem mais como fatos a aceitar do que como resultados a compreender. Depois de aprender a resolver algumas famílias conhecidas de equações, o aluno encontra o método de Picard: define-se uma sequência de funções, encadeiam-se algumas estimativas e afirma-se que a sequência converge para uma única solução.
+Na maioria dos cursos de Equações Diferenciais Ordinárias no Brasil, a existência e unicidade das soluções aparecem como um fato a ser aceito pelo aluno. Depois de aprender a resolver algumas famílias conhecidas de equações, o aluno encontra o método de Picard: define-se uma sequência de funções, iteram-se algumas estimativas e afirma-se que a sequência converge para uma única solução.
 
-Foi assim que conheci o teorema de Cauchy–Lipschitz. O método funcionava, mas sua lógica permanecia escondida nos cálculos. Por que as aproximações deveriam convergir? Por que o limite seria uma solução? E, sobretudo, por que o mesmo procedimento também provaria a unicidade?
+Foi assim que eu primeiro aprendi o teorema de Cauchy–Lipschitz. O método funcionava, mas sua lógica permanecia escondida nos cálculos. Por que as aproximações deveriam convergir? Por que o limite seria uma solução? E, sobretudo, por que o mesmo procedimento também provaria a unicidade?
 
-Quando estudei equações diferenciais na França, encontrei uma organização diferente da teoria. Antes de Picard, demonstra-se um resultado geral de análise: o teorema do ponto fixo de Banach. Em seguida, o problema de valor inicial é transformado numa equação integral, que por sua vez define uma aplicação sobre um espaço de funções. Resolver a EDO passa a significar encontrar um ponto fixo dessa aplicação.
+Quando eu novamente estudei equações diferenciais na França, encontrei uma nova abordagem para essa teoria. Antes de Picard, demonstra-se um resultado geral de análise: o teorema do ponto fixo de Banach. Em seguida, o problema de valor inicial é transformado numa equação integral, que por sua vez define uma aplicação sobre um espaço de funções. Resolver a EDO passa a significar encontrar um ponto fixo dessa aplicação.
 
 Desse ponto de vista, o método de Picard deixa de ser uma construção particular das equações diferenciais. Ele é simplesmente o método das aproximações sucessivas aplicado a uma contração. É essa ligação que quero tornar explícita neste texto, partindo das noções de espaço métrico e completude até chegar ao teorema local de Cauchy–Lipschitz.
 
@@ -101,7 +101,7 @@ $$
 \Phi(x)=x.
 $$
 
-Em outras palavras, procuramos um ponto fixo de $\Phi$. Falta escolher um espaço de funções no qual essa aplicação esteja bem definida e seja contrativa.
+Em outras palavras, procuramos um ponto fixo de $\Phi$. Falta-nos, então, escolher um espaço de funções no qual essa aplicação esteja bem definida e seja contrativa.
 
 ## Espaços métricos e completude
 
@@ -158,7 +158,7 @@ A recíproca não é verdadeira em qualquer espaço. Uma sequência pode aproxim
 
 O exemplo clássico é a diferença entre $\mathbb Q$ e $\mathbb R$. Uma sequência de números racionais pode ser de Cauchy e convergir, em $\mathbb R$, para um número irracional. Por isso, $\mathbb Q$ não é completo com a distância usual.
 
-No nosso problema, a completude terá uma função precisa: depois de provarmos que as aproximações sucessivas formam uma sequência de Cauchy, ela garantirá que o limite existe e ainda é uma função admissível.
+No nosso problema, a completude terá uma função precisa: depois de provarmos que as aproximações sucessivas formam uma sequência de Cauchy, ela garantirá que o limite existe e ainda é uma função no espaço que definimos.
 
 ### O espaço de Banach das funções contínuas
 
@@ -512,7 +512,7 @@ $$
 \qquad\text{em }A.
 $$
 
-A bola $\overline B(x_0,\delta)$ é convexa. Pela desigualdade dos acréscimos finitos, para $(t,x),(t,y)\in A$,
+A bola $\overline B(x_0,\delta)$ é convexa. Pelo Teorema do Valor Médio, para $(t,x),(t,y)\in A$,
 
 $$
 |f(t,x)-f(t,y)|
@@ -537,7 +537,7 @@ $$
 
 existe uma solução em $[t_0-T,t_0+T]$.
 
-O papel da hipótese $C^1$ fica, assim, bem concreto: a continuidade limita o campo vetorial numa vizinhança compacta, enquanto a jacobiana limitada torna $f$ Lipschitz na variável de estado.
+O papel da hipótese $C^1$ fica, assim, bem concreto: a continuidade limita o campo vetorial numa vizinhança compacta, enquanto a jacobiana limitada torna $f$ Lipschitz na variável $x$.
 
 ### Unicidade local
 
@@ -563,7 +563,7 @@ x(t)
 x_0+\int_{t_0}^{t}f(s,x(s))\,ds.
 $$
 
-Essa fórmula define a aplicação de Picard sobre um espaço métrico completo de funções contínuas. A limitação de $f$ mantém as imagens dentro do espaço escolhido; a condição de Lipschitz na variável de estado torna a aplicação contrativa. Banach fornece então um único ponto fixo, que é justamente a solução do problema de Cauchy.
+Essa fórmula define a aplicação de Picard sobre um espaço métrico completo de funções contínuas. A limitação de $f$ mantém as imagens dentro do espaço escolhido; a condição de Lipschitz na variável de estado torna a aplicação contrativa. Banach nos fornece então um único ponto fixo, que é justamente a solução do problema de Cauchy.
 
 As aproximações de Picard
 
