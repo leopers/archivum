@@ -1,0 +1,134 @@
+---
+title: "Suivi de marqueurs fiduciaires pour drones"
+description: "Un détecteur YOLOv8 couplé à un filtre de Kalman pour maintenir l’estimation d’un marqueur d’atterrissage malgré des détections intermittentes."
+year: 2023
+topics: [Vision par ordinateur, Robotique, Estimation d’état]
+status: complete
+featured: true
+repo: "https://github.com/leopers/YOLOv8-Kalman-for-UAV"
+---
+
+import UAVTrackingEvidence from "../../components/UAVTrackingEvidence.astro";
+
+Ce projet, réalisé à l’ITA avec Marcos Sousa et Victor Bastos, étudie une composante précise de l’atterrissage autonome : suivre une référence visuelle même lorsque le détecteur la perd brièvement. Une caméra observe un marqueur fiduciaire, YOLOv8 fournit sa position dans l’image et un filtre de Kalman transforme ces mesures intermittentes en une estimation continue.
+
+Le prototype ne commande pas un aéronef. Il étudie la couche de perception qui pourrait précéder le guidage et la commande d’un eVTOL ou d’un drone.
+
+## Structure du système
+
+Chaque image traverse trois étapes :
+
+1. **Détection.** YOLOv8 renvoie la boîte englobante du marqueur.
+2. **Mesure.** Le centre de cette boîte devient $z_k=(c_x,c_y)^{\mathsf T}$.
+3. **Estimation.** Le filtre prédit la position suivante et la corrige dès qu’une détection est disponible.
+
+YOLO raisonne uniquement à partir de l’image courante. Le filtre conserve un état dynamique entre les images : il lisse ainsi les centres bruités et propage la trajectoire pendant une courte occultation.
+
+<UAVTrackingEvidence locale="fr" />
+
+## Entraînement du détecteur
+
+Le jeu de données rassemble environ 200 photographies du marqueur prises avec un téléphone, à plusieurs distances, orientations et conditions d’éclairage. Le notebook enregistre 162 images d’entraînement, 15 images de validation et un échantillon de test de huit images. Toutes les annotations appartiennent à une seule classe : `Marker`.
+
+Un YOLOv8s pré-entraîné a été affiné pendant 25 époques. Les images demandées en $185\times185$ pixels sont complétées par l’implémentation jusqu’à $192\times192$ ; la taille de lot est 16 et l’optimiseur est SGD. Le transfert d’apprentissage permet ici de travailler avec un jeu de données trop réduit pour apprendre les représentations visuelles à partir de zéro.
+
+Une validation enregistrée donne une précision de $0{,}950$, un rappel de $0{,}826$, $\operatorname{mAP}_{50}=0{,}942$ et $\operatorname{mAP}_{50:95}=0{,}733$. Ces valeurs confirment que le marqueur est détectable, mais la petite taille de la validation impose de les lire comme des résultats de prototype.
+
+```python
+results = self.model.predict(source=image, conf=0.45)
+
+for box in results[0].boxes:
+    x1, y1, x2, y2 = box.xyxy[0]
+    centers.append(((x1 + x2) / 2, (y1 + y2) / 2))
+```
+
+Le détecteur réduit chaque boîte retenue à son centre. L’estimateur suit donc un point bidimensionnel, et non l’échelle ou l’orientation du marqueur.
+
+## Modèle d’état
+
+Le filtre emploie un état à vitesse constante
+
+$$
+\mathbf{x}_k=
+\begin{bmatrix}p_{x,k}&p_{y,k}&v_{x,k}&v_{y,k}\end{bmatrix}^{\mathsf T}
+\tag{1}
+$$
+
+avec la dynamique et l’observation
+
+$$
+\mathbf{x}_k=A\mathbf{x}_{k-1}+B\mathbf{u}_k+\mathbf{w}_k,
+\qquad
+\mathbf{z}_k=H\mathbf{x}_k+\mathbf{v}_k
+\tag{2}
+$$
+
+où
+
+$$
+A=
+\begin{bmatrix}
+1&0&\Delta t&0\\
+0&1&0&\Delta t\\
+0&0&1&0\\
+0&0&0&1
+\end{bmatrix},
+\qquad
+H=
+\begin{bmatrix}1&0&0&0\\0&1&0&0\end{bmatrix}
+\tag{3}
+$$
+
+Les covariances $Q$ et $R$ décrivent respectivement l’incertitude du modèle de mouvement et celle des centres produits par le détecteur.
+
+La prédiction précède l’observation courante :
+
+$$
+\hat{\mathbf{x}}_k^- = A\hat{\mathbf{x}}_{k-1}^+ + B\mathbf{u}_k,
+\qquad
+P_k^- = AP_{k-1}^+A^{\mathsf T}+Q
+\tag{4}
+$$
+
+Lorsqu’un centre est disponible, l’innovation mesure l’écart entre observation et prédiction ; le gain de Kalman les pondère selon leurs incertitudes :
+
+$$
+\begin{aligned}
+\mathbf{r}_k &= \mathbf{z}_k-H\hat{\mathbf{x}}_k^-,\\
+S_k &= HP_k^-H^{\mathsf T}+R,\\
+K_k &= P_k^-H^{\mathsf T}S_k^{-1}
+\end{aligned}
+\tag{5}
+$$
+
+La correction devient
+
+$$
+\hat{\mathbf{x}}_k^+=\hat{\mathbf{x}}_k^-+K_k\mathbf{r}_k,
+\qquad
+P_k^+=(I-K_kH)P_k^-
+\tag{6}
+$$
+
+Si YOLO ne renvoie aucune boîte, la correction est omise mais la prédiction reste disponible. C’est ce comportement que montre la démonstration lorsque le marqueur disparaît.
+
+```python
+prediction = kf.predict()
+
+if centers:
+    measurement = np.array(centers[0]).reshape(2, 1)
+    corrected = kf.filter(measurement)
+```
+
+## Ce que montre le prototype
+
+L’expérience établit le comportement qualitatif recherché : le détecteur reste exploitable malgré les variations d’angle et d’éclairage, l’estimation corrigée converge vers les mesures et le modèle de mouvement traverse de courtes pertes de visibilité. Les deux modules répondent à des questions distinctes : _où l’image situe-t-elle le marqueur maintenant ?_ et _où se trouve-t-il vraisemblablement, compte tenu de cette mesure et de sa trajectoire récente ?_
+
+L’implémentation demeure volontairement limitée. Elle suit le premier centre détecté, sans association multi-objet ni validation statistique. La période d’échantillonnage et l’accélération sont fixes, et la boucle originale effectue deux prédictions lorsqu’une détection existe. Enfin, le suivi est évalué visuellement, sans erreur de trajectoire ni métrique dédiée aux occultations.
+
+Une version suivante devrait mesurer les timestamps, n’effectuer qu’une prédiction par image, pondérer les mises à jour par la confiance et utiliser un gating de Mahalanobis. Une trajectoire de référence permettrait ensuite de comparer l’erreur brute et l’erreur filtrée en fonction de la durée d’occultation, avant toute intégration avec un contrôleur d’atterrissage.
+
+## Références
+
+1. G. Jocher, A. Chaurasia et J. Qiu, _Ultralytics YOLO_, 2023.
+2. R. E. Kalman, « A New Approach to Linear Filtering and Prediction Problems », 1960.

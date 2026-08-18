@@ -2,13 +2,24 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 const all = [
-  ...(await getCollection("writing")),
+  ...(await getCollection("writing", ({ data }) => !data.draft)),
   ...(await getCollection("projects")),
+  ...(await getCollection("music", ({ data }) => !data.draft)),
 ];
-const counts = new Map<string, number>();
-all.forEach((e) =>
-  e.data.topics.forEach((t) => counts.set(t, (counts.get(t) || 0) + 1)),
+const grouped = new Map<string, typeof all>();
+all.forEach((entry) =>
+  entry.data.topics.forEach((topic) =>
+    grouped.set(topic, [...(grouped.get(topic) || []), entry]),
+  ),
 );
+const entryHref = (entry: (typeof all)[number]) =>
+  `/${entry.collection === "projects" ? "projects" : entry.collection === "music" ? "music" : "writing"}/${entry.id}`;
+const entryType = (entry: (typeof all)[number]) =>
+  entry.collection === "projects"
+    ? "Project"
+    : entry.collection === "music"
+      ? "Music"
+      : "Essay";
 const descriptions: Record<string, string> = {
   Probability: "Probability and statistics.",
   Optimization: "Optimization methods and geometry.",
@@ -30,7 +41,7 @@ const descriptions: Record<string, string> = {
     </p>
   </header><div class="topic-grid">
     {
-      [...counts.entries()].sort().map(([topic, count]) => (
+      [...grouped.entries()].sort().map(([topic, entries]) => (
         <section
           class="topic-card"
           id={topic.toLowerCase().replaceAll(" ", "-")}
@@ -39,8 +50,18 @@ const descriptions: Record<string, string> = {
             <h2>{topic}</h2>
             <p>{descriptions[topic] || "Notes and projects."}</p>
             <span class="tag">
-              {count} {count === 1 ? "entry" : "entries"}
+              {entries.length} {entries.length === 1 ? "entry" : "entries"}
             </span>
+            <ul class="topic-entries">
+              {entries.map((entry) => (
+                <li>
+                  <a href={entryHref(entry)}>
+                    <span>{entry.data.title}</span>
+                    <small>{entryType(entry)} →</small>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </>
         </section>
       ))

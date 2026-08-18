@@ -1,0 +1,251 @@
+---
+interface Props {
+  locale?: "en" | "fr";
+}
+const { locale = "en" } = Astro.props;
+const labels =
+  locale === "fr"
+    ? ["mathématiques", "informatique", "musique"]
+    : ["mathematics", "computation", "music"];
+---
+
+<figure class="about-field" data-labels={JSON.stringify(labels)}>
+  <canvas aria-hidden="true"></canvas>
+  <figcaption>
+    {
+      labels.map((label, index) => (
+        <span>
+          <i class={`signal-${index}`} />
+          {label}
+        </span>
+      ))
+    }
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".about-field").forEach((host) => {
+    const canvas = host.querySelector("canvas");
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context) return;
+
+    let width = 0;
+    let height = 0;
+    let frame = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+    let visible = true;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const start = performance.now();
+    const css = (name: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+    const resize = () => {
+      const box = host.getBoundingClientRect();
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      width = box.width;
+      height = box.height - 38;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw(reduced ? 5200 : performance.now());
+    };
+
+    const membrane = (
+      cx: number,
+      cy: number,
+      radius: number,
+      time: number,
+      phase: number,
+    ) => {
+      context.beginPath();
+      for (let i = 0; i <= 96; i++) {
+        const angle = (i / 96) * Math.PI * 2;
+        const noise =
+          Math.sin(angle * 3 + time * 0.00042 + phase) * 4 +
+          Math.sin(angle * 5 - time * 0.00027 + phase) * 2;
+        const r = radius + noise;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r * 0.72;
+        if (i === 0) context.moveTo(x, y);
+        else context.lineTo(x, y);
+      }
+      context.closePath();
+    };
+
+    const draw = (time: number) => {
+      context.clearRect(0, 0, width, height);
+      pointerX += (targetX - pointerX) * 0.035;
+      pointerY += (targetY - pointerY) * 0.035;
+      const green = css("--accent");
+      const purple = css("--violet");
+      const line = css("--line");
+      const paper = css("--paper");
+      const cx = width * 0.5 + pointerX * 8;
+      const cy = height * 0.48 + pointerY * 5;
+      const base = Math.min(width, height) * 0.22;
+
+      context.save();
+      context.strokeStyle = line;
+      context.globalAlpha = 0.52;
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(width * 0.08, cy);
+      context.lineTo(width * 0.92, cy);
+      context.moveTo(cx, height * 0.08);
+      context.lineTo(cx, height * 0.88);
+      context.stroke();
+      for (let n = -4; n <= 4; n++) {
+        context.beginPath();
+        context.moveTo(cx + n * 26, cy - 3);
+        context.lineTo(cx + n * 26, cy + 3);
+        context.stroke();
+      }
+      context.restore();
+
+      [1, 1.48, 1.94].forEach((scale, index) => {
+        context.save();
+        context.strokeStyle = index === 1 ? purple : green;
+        context.lineWidth = index === 1 ? 1.25 : 1;
+        context.globalAlpha = 0.75 - index * 0.16;
+        membrane(cx, cy, base * scale, time, index * 1.7);
+        context.stroke();
+        context.restore();
+      });
+
+      // A soft waveform passes through the biological membranes.
+      context.save();
+      context.strokeStyle = purple;
+      context.lineWidth = 1.3;
+      context.globalAlpha = 0.62;
+      context.beginPath();
+      for (let x = width * 0.1; x <= width * 0.9; x += 2) {
+        const envelope = Math.exp(-Math.pow((x - cx) / (width * 0.27), 2));
+        const y = cy + Math.sin(x * 0.075 - time * 0.002) * 9 * envelope;
+        if (x === width * 0.1) context.moveTo(x, y);
+        else context.lineTo(x, y);
+      }
+      context.stroke();
+      context.restore();
+
+      const orbitData = [
+        { radius: base * 1.06, speed: 0.00038, phase: 0, color: green },
+        { radius: base * 1.5, speed: -0.00025, phase: 2.1, color: purple },
+        { radius: base * 1.93, speed: 0.00018, phase: 4.2, color: green },
+      ];
+      orbitData.forEach((orbit, index) => {
+        const angle = (time - start) * orbit.speed + orbit.phase;
+        const x = cx + Math.cos(angle) * orbit.radius;
+        const y = cy + Math.sin(angle) * orbit.radius * 0.72;
+        context.save();
+        context.fillStyle = paper;
+        context.strokeStyle = orbit.color;
+        context.lineWidth = 1.4;
+        context.shadowColor = orbit.color;
+        context.shadowBlur = 7;
+        context.beginPath();
+        context.arc(x, y, 3.5 + index * 0.55, 0, Math.PI * 2);
+        context.fill();
+        context.stroke();
+        context.restore();
+      });
+
+      context.save();
+      context.fillStyle = green;
+      context.beginPath();
+      context.arc(cx, cy, 5, 0, Math.PI * 2);
+      context.fill();
+      context.strokeStyle = purple;
+      context.globalAlpha = 0.55;
+      context.beginPath();
+      context.arc(cx, cy, 11 + Math.sin(time * 0.0015) * 2, 0, Math.PI * 2);
+      context.stroke();
+      context.restore();
+    };
+
+    const loop = (time: number) => {
+      if (visible) draw(time);
+      frame = requestAnimationFrame(loop);
+    };
+    host.addEventListener("pointermove", (event) => {
+      const box = host.getBoundingClientRect();
+      targetX = (event.clientX - box.left) / box.width - 0.5;
+      targetY = (event.clientY - box.top) / box.height - 0.5;
+    });
+    host.addEventListener("pointerleave", () => {
+      targetX = 0;
+      targetY = 0;
+    });
+    new ResizeObserver(resize).observe(host);
+    new IntersectionObserver(([entry]) => (visible = entry.isIntersecting), {
+      threshold: 0.05,
+    }).observe(host);
+    new MutationObserver(() =>
+      draw(reduced ? 5200 : performance.now()),
+    ).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    resize();
+    if (!reduced) frame = requestAnimationFrame(loop);
+    addEventListener("pagehide", () => cancelAnimationFrame(frame), {
+      once: true,
+    });
+  });
+</script>
+
+<style>
+  .about-field {
+    height: 350px;
+    margin: 42px 0 0;
+    position: relative;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+  }
+  figcaption {
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    color: var(--muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  figcaption span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  figcaption i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  figcaption .signal-1 {
+    background: var(--violet);
+  }
+  @media (max-width: 760px) {
+    .about-field {
+      height: 280px;
+      margin-top: 0;
+    }
+    figcaption {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .about-field {
+      cursor: default;
+    }
+  }
+</style>

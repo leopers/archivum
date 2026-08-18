@@ -1,14 +1,17 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import AboutField from "../components/AboutField.astro";
 ---
 
 <BaseLayout title="About — Leonardo Dias"
-  ><header class="page-head">
-    <div class="eyebrow">About</div><h1>I’m Leo.</h1><p>
-      I’m from Brazil and currently studying engineering at École Polytechnique
-      in France.
-    </p>
-  </header><div class="about-grid">
+  ><div class="about-hero">
+    <header class="page-head">
+      <div class="eyebrow">About</div><h1>I’m Leo.</h1><p>
+        I’m from Brazil and currently studying engineering at École
+        Polytechnique in France.
+      </p>
+    </header><AboutField />
+  </div><div class="about-grid">
     <section>
       <h2>Background</h2><p>
         Before moving to France, I studied computer engineering at ITA

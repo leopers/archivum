@@ -1,0 +1,135 @@
+---
+interface Props {
+  locale?: "en" | "fr";
+}
+
+const { locale = "en" } = Astro.props;
+const fr = locale === "fr";
+const copy = fr
+  ? {
+      comparison:
+        "Réponses indicielles des deux contrôleurs sur la même plante en boucle fermée.",
+      evolution:
+        "La meilleure fitness progresse par paliers jusqu’au seuil d’arrêt de 83.",
+      metric: "Mesure",
+      rise: "Temps de montée",
+      overshoot: "Dépassement",
+      settling: "Temps d’établissement",
+      error: "Erreur statique",
+    }
+  : {
+      comparison:
+        "Step responses of both controllers on the same closed-loop plant.",
+      evolution:
+        "Best fitness improves in discrete steps until it crosses the stopping target of 83.",
+      metric: "Metric",
+      rise: "Rise time",
+      overshoot: "Overshoot",
+      settling: "Settling time",
+      error: "Steady-state error",
+    };
+---
+
+<div class="result-summary" role="group" aria-label="PID tuning comparison">
+  <table>
+    <thead><tr><th>{copy.metric}</th><th>GA</th><th>ZN</th></tr></thead>
+    <tbody>
+      <tr><th>K<sub>p</sub></th><td>67.742</td><td>134.400</td></tr>
+      <tr><th>K<sub>i</sub></th><td>3.226</td><td>505.733</td></tr>
+      <tr><th>K<sub>d</sub></th><td>32.258</td><td>8.929</td></tr>
+      <tr><th>{copy.rise}</th><td>0.073 s</td><td>0.112 s</td></tr>
+      <tr
+        ><th>{copy.overshoot}</th><td class="best">1.033%</td><td>61.805%</td
+        ></tr
+      >
+      <tr
+        ><th>{copy.settling}</th><td class="best">0.915 s</td><td>1.900 s</td
+        ></tr
+      >
+      <tr><th>{copy.error}</th><td>0</td><td>0</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="figure-grid">
+  <figure>
+    <img
+      src="/projects/genetic-pid-tuning/comparison_plot.png"
+      alt={copy.comparison}
+      loading="lazy"
+    />
+    <figcaption>{copy.comparison}</figcaption>
+  </figure>
+  <figure>
+    <img
+      src="/projects/genetic-pid-tuning/Fitness_evolution.png"
+      alt={copy.evolution}
+      loading="lazy"
+    />
+    <figcaption>{copy.evolution}</figcaption>
+  </figure>
+</div>
+
+<style>
+  .result-summary {
+    margin: 2rem 0 2.4rem;
+    overflow-x: auto;
+    border-top: 2px solid var(--accent);
+    border-bottom: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+  }
+  th,
+  td {
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    white-space: nowrap;
+  }
+  th:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+  thead th {
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  td.best {
+    color: var(--accent);
+    font-weight: 650;
+  }
+  .figure-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin: 2.4rem 0;
+  }
+  figure {
+    margin: 0;
+  }
+  img {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  figcaption {
+    margin-top: 0.65rem;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 0.76rem;
+    line-height: 1.5;
+  }
+  @media (max-width: 720px) {
+    .figure-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

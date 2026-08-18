@@ -3,6 +3,8 @@ import { getCollection, render } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleLayout from "../layouts/ArticleLayout.astro";
 import EntryList from "./EntryList.astro";
+import LivingCircuit from "./LivingCircuit.astro";
+import AboutField from "./AboutField.astro";
 import { localePath, ui, type Locale } from "../i18n/ui";
 
 const { locale, slug = "" } = Astro.props as { locale: Locale; slug?: string };
@@ -62,12 +64,27 @@ if (slug.startsWith("music/"))
 if (articleEntry) ({ Content } = await render(articleEntry));
 
 const allForTopics = [...writing, ...displayedProjects, ...musicEntries];
-const counts = new Map<string, number>();
+const groupedTopics = new Map<string, typeof allForTopics>();
 allForTopics.forEach((entry) =>
   entry.data.topics.forEach((topic) =>
-    counts.set(topic, (counts.get(topic) || 0) + 1),
+    groupedTopics.set(topic, [...(groupedTopics.get(topic) || []), entry]),
   ),
 );
+const topicEntryHref = (entry: (typeof allForTopics)[number]) => {
+  const section =
+    entry.collection === "projectsFr" || entry.collection === "projects"
+      ? "projects"
+      : entry.collection === "music"
+        ? "music"
+        : "writing";
+  return `${localePath(locale, section)}/${entry.id}`;
+};
+const topicEntryType = (entry: (typeof allForTopics)[number]) =>
+  entry.collection === "projectsFr" || entry.collection === "projects"
+    ? t.project
+    : entry.collection === "music"
+      ? t.music
+      : t.researchNote;
 ---
 
 {
@@ -88,6 +105,7 @@ allForTopics.forEach((entry) =>
             <h1>Leonardo Dias</h1>
           </>
         </div>
+        <LivingCircuit />
         <div class="home-bio">
           <>
             <p>{t.homeBio1}</p>
@@ -195,7 +213,7 @@ allForTopics.forEach((entry) =>
           </>
         </header>
         <div class="topic-grid">
-          {[...counts.entries()].sort().map(([topic, count]) => (
+          {[...groupedTopics.entries()].sort().map(([topic, entries]) => (
             <section
               class="topic-card"
               id={topic.toLowerCase().replaceAll(" ", "-")}
@@ -203,8 +221,18 @@ allForTopics.forEach((entry) =>
               <h2>{topic}</h2>
               <p>{topicDescriptions[locale][topic] || "Notes et projets."}</p>
               <span class="tag">
-                {count} {count === 1 ? t.entry : t.entries}
+                {entries.length} {entries.length === 1 ? t.entry : t.entries}
               </span>
+              <ul class="topic-entries">
+                {entries.map((entry) => (
+                  <li>
+                    <a href={topicEntryHref(entry)}>
+                      <span>{entry.data.title}</span>
+                      <small>{topicEntryType(entry)} →</small>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </section>
           ))}
         </div>
@@ -280,13 +308,16 @@ allForTopics.forEach((entry) =>
   ) : slug === "about" ? (
     <BaseLayout locale={locale} title={`${t.about} — Leonardo Dias`}>
       <>
-        <header class="page-head">
-          <>
-            <div class="eyebrow">{t.about}</div>
-            <h1>{t.aboutTitle}</h1>
-            <p>{t.aboutIntro}</p>
-          </>
-        </header>
+        <div class="about-hero">
+          <header class="page-head">
+            <>
+              <div class="eyebrow">{t.about}</div>
+              <h1>{t.aboutTitle}</h1>
+              <p>{t.aboutIntro}</p>
+            </>
+          </header>
+          <AboutField locale={locale} />
+        </div>
         <div class="about-grid">
           <>
             <section>
