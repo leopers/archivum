@@ -16,7 +16,7 @@ export const ui = {
       about: "About",
     },
     footer: "Built as a living notebook.",
-    personalArchive: "Personal archive",
+    personalArchive: "Learning",
     homeBio1:
       "I’m Leo, a Brazilian engineering student at École Polytechnique. I’m interested in the meeting point between applied mathematics and computation—from machine learning and formal verification to electronics.",
     homeBio2:
@@ -25,6 +25,11 @@ export const ui = {
     allNotes: "All notes",
     projects: "Projects",
     allProjects: "All projects",
+    status: {
+      ongoing: "Ongoing",
+      complete: "Complete",
+      archived: "Archived",
+    },
     writingLabel: "Writing",
     writingTitle: "Notes & essays",
     writingDesc: "Notes from my studies.",
@@ -82,6 +87,11 @@ export const ui = {
     allNotes: "Tous les textes",
     projects: "Projets",
     allProjects: "Tous les projets",
+    status: {
+      ongoing: "En cours",
+      complete: "Terminé",
+      archived: "Archivé",
+    },
     writingLabel: "Textes",
     writingTitle: "Notes et essais",
     writingDesc: "Notes issues de mes études.",

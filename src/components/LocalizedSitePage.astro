@@ -11,6 +11,8 @@ const writing = (
   await getCollection("writing", ({ data }) => !data.draft)
 ).sort((a, b) => +b.data.published - +a.data.published);
 const projects = await getCollection("projects");
+const translatedProjects = await getCollection("projectsFr");
+const displayedProjects = locale === "fr" ? translatedProjects : projects;
 const musicEntries = (
   await getCollection("music", ({ data }) => !data.draft)
 ).sort((a, b) => +b.data.published - +a.data.published);
@@ -45,6 +47,7 @@ const topicDescriptions: Record<Locale, Record<string, string>> = {
     "Embedded Systems": "Matériel, firmware et systèmes embarqués.",
     "Internet of Things": "Objets connectés et interfaces réseau.",
     "C++": "Programmation système et embarquée.",
+    PyTorch: "Expériences et implémentations de réseaux neuronaux.",
   },
 };
 
@@ -53,12 +56,12 @@ let Content: any;
 if (slug.startsWith("writing/"))
   articleEntry = writing.find((entry) => entry.id === slug.slice(8));
 if (slug.startsWith("projects/"))
-  articleEntry = projects.find((entry) => entry.id === slug.slice(9));
+  articleEntry = displayedProjects.find((entry) => entry.id === slug.slice(9));
 if (slug.startsWith("music/"))
   articleEntry = musicEntries.find((entry) => entry.id === slug.slice(6));
 if (articleEntry) ({ Content } = await render(articleEntry));
 
-const allForTopics = [...writing, ...projects, ...musicEntries];
+const allForTopics = [...writing, ...displayedProjects, ...musicEntries];
 const counts = new Map<string, number>();
 allForTopics.forEach((entry) =>
   entry.data.topics.forEach((topic) =>
@@ -69,7 +72,11 @@ allForTopics.forEach((entry) =>
 
 {
   articleEntry && Content ? (
-    <ArticleLayout data={articleEntry.data} locale={locale} englishOnly={true}>
+    <ArticleLayout
+      data={articleEntry.data}
+      locale={locale}
+      englishOnly={articleEntry.collection !== "projectsFr"}
+    >
       <Content />
     </ArticleLayout>
   ) : slug === "" ? (
@@ -88,17 +95,19 @@ allForTopics.forEach((entry) =>
           </>
         </div>
       </section>
-      <section class="section">
-        <>
-          <div class="section-heading">
-            <>
-              <h2>{t.recentWriting}</h2>
-              <a href={localePath(locale, "writing")}>{t.allNotes} →</a>
-            </>
-          </div>
-          <EntryList entries={writing.slice(0, 3)} locale={locale} />
-        </>
-      </section>
+      {writing.length > 0 && (
+        <section class="section">
+          <>
+            <div class="section-heading">
+              <>
+                <h2>{t.recentWriting}</h2>
+                <a href={localePath(locale, "writing")}>{t.allNotes} →</a>
+              </>
+            </div>
+            <EntryList entries={writing.slice(0, 3)} locale={locale} />
+          </>
+        </section>
+      )}
       <section class="section">
         <>
           <div class="section-heading">
@@ -108,14 +117,14 @@ allForTopics.forEach((entry) =>
             </>
           </div>
           <div class="projects-grid">
-            {projects
+            {displayedProjects
               .filter((project) => project.data.featured)
               .map((project) => (
                 <a
                   class="project-card"
                   href={`${localePath(locale, "projects")}/${project.id}`}
                 >
-                  <span class="eyebrow">{project.data.status}</span>
+                  <span class="eyebrow">{t.status[project.data.status]}</span>
                   <h3>{project.data.title}</h3>
                   <p>{project.data.description}</p>
                   <footer>
@@ -139,7 +148,11 @@ allForTopics.forEach((entry) =>
           </>
         </header>
         <section class="section">
-          <EntryList entries={writing} locale={locale} />
+          {writing.length > 0 ? (
+            <EntryList entries={writing} locale={locale} />
+          ) : (
+            <p class="empty-note">Aucun texte publié pour le moment.</p>
+          )}
         </section>
       </>
     </BaseLayout>
@@ -154,12 +167,12 @@ allForTopics.forEach((entry) =>
           </>
         </header>
         <div class="projects-grid" style="margin-bottom:90px">
-          {projects.map((project) => (
+          {displayedProjects.map((project) => (
             <a
               class="project-card"
               href={`${localePath(locale, "projects")}/${project.id}`}
             >
-              <span class="eyebrow">{project.data.status}</span>
+              <span class="eyebrow">{t.status[project.data.status]}</span>
               <h3>{project.data.title}</h3>
               <p>{project.data.description}</p>
               <footer>
