@@ -8,7 +8,7 @@ import rehypeKatex from "rehype-katex";
 export default defineConfig({
   output: "server",
   adapter: cloudflare({ imageService: "passthrough" }),
-  site: "https://leonardo-archivum.loleopers.chatgpt.site",
+  site: "https://leopers.dev",
   i18n: {
     locales: ["en", "fr"],
     defaultLocale: "en",
