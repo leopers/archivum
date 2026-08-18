@@ -8,7 +8,6 @@ const label = locale === "fr" ? "Formation" : "Education";
 ---
 
 <aside class="education-marks" aria-label={label}>
-  <span class="education-label">{label}</span>
   <div class="education-list">
     <a
       class="education-mark education-mark--x"
@@ -23,7 +22,7 @@ const label = locale === "fr" ? "Formation" : "Education";
         height="468"
         alt="École Polytechnique"
       />
-      <span>{locale === "fr" ? "Cycle ingénieur · Aujourd’hui" : "Engineering cycle · Current"}</span>
+      <span>Cycle Ingénieur</span>
     </a>
     <a
       class="education-mark education-mark--ita"
@@ -34,11 +33,11 @@ const label = locale === "fr" ? "Formation" : "Education";
     >
       <img
         src="/institutions/ita.webp"
-        width="300"
-        height="360"
+        width="500"
+        height="190"
         alt="ITA — Instituto Tecnológico de Aeronáutica"
       />
-      <span>{locale === "fr" ? "Ingénierie informatique · Diplômé" : "Computer engineering · Alumnus"}</span>
+      <span>Computer Engineering</span>
     </a>
   </div>
 </aside>
