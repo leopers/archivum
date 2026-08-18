@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+const projects = await getCollection("projects");
+---
+
+<BaseLayout title="Projects — Leonardo Dias"
+  ><header class="page-head">
+    <div class="eyebrow">Work</div><h1>Projects</h1><p>
+      Code and research projects.
+    </p>
+  </header><div class="projects-grid" style="margin-bottom:90px">
+    {
+      projects.map((p) => (
+        <a class="project-card" href={`/projects/${p.id}`}>
+          <>
+            <span class="eyebrow">{p.data.status}</span>
+            <h3>{p.data.title}</h3>
+            <p>{p.data.description}</p>
+            <footer>
+              <>
+                <span>{p.data.topics.join(" · ")}</span>
+                <span>{p.data.year}</span>
+              </>
+            </footer>
+          </>
+        </a>
+      ))
+    }
+  </div></BaseLayout
+>

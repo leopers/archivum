@@ -1,0 +1,18 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryList from "../../components/EntryList.astro";
+const entries = (
+  await getCollection("writing", ({ data }) => !data.draft)
+).sort((a, b) => +b.data.published - +a.data.published);
+---
+
+<BaseLayout title="Writing — Leonardo Dias"
+  ><header class="page-head">
+    <div class="eyebrow">Writing</div><h1>Notes & essays</h1><p>
+      Notes from my studies.
+    </p>
+  </header><section class="section">
+    <EntryList entries={entries} />
+  </section></BaseLayout
+>

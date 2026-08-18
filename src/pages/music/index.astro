@@ -1,0 +1,105 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryList from "../../components/EntryList.astro";
+
+const entries = (await getCollection("music", ({ data }) => !data.draft)).sort(
+  (a, b) => +b.data.published - +a.data.published,
+);
+
+const playlists = [
+  {
+    title: "proggers?",
+    id: "3BtORWDAYATz0ZNmMco5xV",
+    description: "Yes, Camel, Gentle Giant, Rush, Eloy, and others.",
+  },
+  {
+    title: "minimal techno",
+    id: "2y3G1lOEELXLwUxrdokBD0",
+    description: "Boris Brejcha, Victor Ruiz, Alex Stein, and Ann Clue.",
+  },
+  {
+    title: "Brasa?!?!",
+    id: "3cGleuDmttj6cVmx8hyUIr",
+    description: "Brazilian rock, forró, MPB, and related music.",
+  },
+];
+---
+
+<BaseLayout title="Music — Leonardo Dias">
+  <header class="page-head music-head">
+    <div class="eyebrow">Music</div>
+    <h1>Listening & writing</h1>
+    <p>Playlists and notes about music.</p>
+    <a
+      class="spotify-profile"
+      href="https://open.spotify.com/user/chyf50iwrfskqm5lv5nfjzr7k"
+      target="_blank"
+      rel="noreferrer">Spotify profile ↗</a
+    >
+  </header>
+
+  <section class="music-section" aria-labelledby="featured-playlists">
+    <div class="section-heading">
+      <h2 id="featured-playlists">Featured playlists</h2>
+    </div>
+    <div class="music-player">
+      <div class="playlist-index" role="list" aria-label="Featured playlists">
+        {
+          playlists.map((playlist, index) => (
+            <button
+              class="playlist-choice"
+              type="button"
+              data-playlist={playlist.id}
+              aria-pressed={index === 0 ? "true" : "false"}
+            >
+              <span class="playlist-number">0{index + 1}</span>
+              <span>
+                <strong>{playlist.title}</strong>
+                <small>{playlist.description}</small>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+      <iframe
+        class="spotify-embed"
+        title="Featured Spotify playlist"
+        src={`https://open.spotify.com/embed/playlist/${playlists[0].id}?utm_source=generator&theme=0`}
+        width="100%"
+        height="500"
+        allowfullscreen
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <section class="section music-writing">
+    <div class="section-heading">
+      <h2>Music writing</h2>
+    </div>
+    {
+      entries.length > 0 ? (
+        <EntryList entries={entries} type="music" />
+      ) : (
+        <p class="empty-note">Music notes will appear here.</p>
+      )
+    }
+  </section>
+
+  <script is:inline>
+    const frame = document.querySelector(".spotify-embed");
+    document.querySelectorAll(".playlist-choice").forEach((button) => {
+      button.addEventListener("click", () => {
+        const id = button.dataset.playlist;
+        if (!id || !frame) return;
+        document
+          .querySelectorAll(".playlist-choice")
+          .forEach((item) =>
+            item.setAttribute("aria-pressed", String(item === button)),
+          );
+        frame.src = `https://open.spotify.com/embed/playlist/${id}?utm_source=generator&theme=0`;
+      });
+    });
+  </script>
+</BaseLayout>

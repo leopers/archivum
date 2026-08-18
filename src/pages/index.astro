@@ -1,0 +1,58 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import EntryList from "../components/EntryList.astro";
+const writing = (await getCollection("writing", ({ data }) => !data.draft))
+  .sort((a, b) => +b.data.published - +a.data.published)
+  .slice(0, 3);
+const projects = (await getCollection("projects")).filter(
+  (p) => p.data.featured,
+);
+---
+
+<BaseLayout detectLanguage={true}
+  ><section class="home-intro">
+    <div class="home-identity">
+      <span class="eyebrow">Personal archive</span>
+      <h1>Leonardo Dias</h1>
+    </div>
+    <div class="home-bio">
+      <p>
+        I’m Leo, a Brazilian engineering student at École Polytechnique. I’m
+        interested in the meeting point between applied mathematics and
+        computation—from machine learning and formal verification to
+        electronics.
+      </p>
+      <p>
+        I keep this site as a record of what I’m learning, building, and
+        thinking about, with the occasional detour into music.
+      </p>
+    </div>
+  </section><section class="section">
+    <div class="section-heading">
+      <h2>Recent writing</h2><a href="/writing">All notes →</a>
+    </div><EntryList entries={writing} />
+  </section><section class="section">
+    <div class="section-heading">
+      <h2>Projects</h2><a href="/projects">All projects →</a>
+    </div><div class="projects-grid">
+      {
+        projects.map((p) => (
+          <a class="project-card" href={`/projects/${p.id}`}>
+            <>
+              <span class="eyebrow">{p.data.status}</span>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.description}</p>
+              <footer>
+                <>
+                  <span>{p.data.topics.join(" · ")}</span>
+                  <span>{p.data.year}</span>
+                </>
+              </footer>
+            </>
+          </a>
+        ))
+      }
+    </div>
+  </section></BaseLayout
+>

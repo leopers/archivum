@@ -1,0 +1,43 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { localePath, ui, type Locale } from "../i18n/ui";
+const { data, locale = "en", englishOnly = false } = Astro.props;
+const t = ui[locale as Locale];
+const dateLocale = locale === "fr" ? "fr-FR" : "en-GB";
+const date = data.published
+  ? data.published.toLocaleDateString(dateLocale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  : String(data.year);
+---
+
+<BaseLayout
+  title={`${data.title} — Leonardo Dias`}
+  description={data.description}
+  locale={locale}
+  ><div class="article-wrap">
+    <article>
+      <header class="article-head">
+        <div class="eyebrow">
+          {data.published ? t.researchNote : t.project}
+        </div><h1>{data.title}</h1><div class="article-sub">
+          {data.description}
+        </div><div class="article-meta">{date} · {data.topics.join(" / ")}</div>
+      </header>{
+        englishOnly && <p class="translation-note">{t.englishOnly}</p>
+      }<div class="prose"><slot /></div>
+    </article><aside class="aside">
+      <div class="eyebrow">{t.filedUnder}</div>{
+        data.topics.map((topic: string) => (
+          <a
+            href={`${localePath(locale as Locale, "topics")}#${topic.toLowerCase().replaceAll(" ", "-")}`}
+          >
+            {topic}
+          </a>
+        ))
+      }
+    </aside>
+  </div></BaseLayout
+>

@@ -1,0 +1,45 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+const all = [
+  ...(await getCollection("writing")),
+  ...(await getCollection("projects")),
+];
+const counts = new Map<string, number>();
+all.forEach((e) =>
+  e.data.topics.forEach((t) => counts.set(t, (counts.get(t) || 0) + 1)),
+);
+const descriptions: Record<string, string> = {
+  Probability: "Probability and statistics.",
+  Optimization: "Optimization methods and geometry.",
+  "Machine Learning": "Learning methods and models.",
+  Algorithms: "Algorithms and computation.",
+  "Computer Vision": "Image processing and visual learning.",
+  Simulation: "Numerical and Monte Carlo experiments.",
+};
+---
+
+<BaseLayout title="Topics — Leonardo Dias"
+  ><header class="page-head">
+    <div class="eyebrow">Index</div><h1>Topics</h1><p>
+      Notes and projects grouped by subject.
+    </p>
+  </header><div class="topic-grid">
+    {
+      [...counts.entries()].sort().map(([topic, count]) => (
+        <section
+          class="topic-card"
+          id={topic.toLowerCase().replaceAll(" ", "-")}
+        >
+          <>
+            <h2>{topic}</h2>
+            <p>{descriptions[topic] || "Notes and projects."}</p>
+            <span class="tag">
+              {count} {count === 1 ? "entry" : "entries"}
+            </span>
+          </>
+        </section>
+      ))
+    }
+  </div></BaseLayout
+>

@@ -1,0 +1,45 @@
+---
+import { localePath, type Locale } from "../i18n/ui";
+const { entries, type = "writing", locale = "en" } = Astro.props;
+const dateLocale = locale === "fr" ? "fr-FR" : "en-GB";
+const prefix = localePath(locale as Locale, type);
+---
+
+<ul class="entry-list">
+  {
+    entries.map((entry: any) => (
+      <li class="entry">
+        <>
+          <div class="entry-meta">
+            {type === "writing"
+              ? entry.data.published.toLocaleDateString(dateLocale, {
+                  month: "short",
+                  year: "numeric",
+                })
+              : entry.data.year}
+          </div>
+          <div>
+            <>
+              <h3>
+                <a href={`${prefix}/${entry.id}`}>{entry.data.title}</a>
+              </h3>
+              <p>{entry.data.description}</p>
+              <div style="margin-top:12px">
+                {entry.data.topics.map((t: string) => (
+                  <span class="tag">{t}</span>
+                ))}
+              </div>
+            </>
+          </div>
+          <a
+            class="arrow"
+            aria-label={`Read ${entry.data.title}`}
+            href={`${prefix}/${entry.id}`}
+          >
+            ↗
+          </a>
+        </>
+      </li>
+    ))
+  }
+</ul>

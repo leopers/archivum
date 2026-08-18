@@ -1,0 +1,127 @@
+---
+import "../styles/global.css";
+import {
+  languageNames,
+  localePath,
+  locales,
+  ui,
+  type Locale,
+} from "../i18n/ui";
+const {
+  title = "Leonardo Dias — Research Archive",
+  description = "Notes, experiments, and projects in mathematics and computer science.",
+  locale: localeProp,
+  detectLanguage = false,
+} = Astro.props;
+const locale = (localeProp || Astro.currentLocale || "en") as Locale;
+const t = ui[locale];
+const path = Astro.url.pathname;
+const unprefixedPath = path.replace(/^\/fr(?=\/|$)/, "") || "/";
+const links = [
+  ["writing", t.nav.writing],
+  ["projects", t.nav.projects],
+  ["topics", t.nav.topics],
+  ["music", t.nav.music],
+  ["about", t.nav.about],
+];
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" /><meta
+      name="viewport"
+      content="width=device-width"
+    />
+    <meta name="description" content={description} /><meta
+      name="theme-color"
+      content="#f7f2e8"
+    />
+    {
+      locales.map((language) => (
+        <link
+          rel="alternate"
+          hreflang={language}
+          href={new URL(localePath(language, unprefixedPath), Astro.site)}
+        />
+      ))
+    }
+    <title>{title}</title>
+    <script is:inline>
+      const t = localStorage.getItem("theme");
+      if (t) document.documentElement.dataset.theme = t;
+      else if (matchMedia("(prefers-color-scheme: dark)").matches)
+        document.documentElement.dataset.theme = "dark";
+    </script>
+  </head><body
+    ><div class="shell">
+      <header class="site-header">
+        <a class="brand" href={localePath(locale)}
+          >L. Dias <span>/ {t.personalArchive}</span></a
+        ><nav class="nav" aria-label="Primary">
+          {
+            links.map(([slug, label]) => (
+              <a
+                href={localePath(locale, slug)}
+                aria-current={
+                  unprefixedPath.startsWith(`/${slug}`) ? "page" : undefined
+                }
+              >
+                {label}
+              </a>
+            ))
+          }<div class="language-switcher" aria-label="Language">
+            {
+              locales.map((language) => (
+                <a
+                  href={localePath(language, unprefixedPath)}
+                  hreflang={language}
+                  lang={language}
+                  data-language={language}
+                  aria-current={language === locale ? "true" : undefined}
+                  title={languageNames[language]}
+                >
+                  {language.toUpperCase()}
+                </a>
+              ))
+            }
+          </div><button
+            class="theme-toggle"
+            aria-label="Toggle color theme"
+            title="Toggle color theme">◐</button
+          >
+        </nav>
+      </header>
+      <main><slot /></main><footer class="site-footer">
+        <span>© {new Date().getFullYear()} Leonardo Dias</span><span
+          >{t.footer}</span
+        >
+      </footer>
+    </div><script is:inline>
+      document.querySelector(".theme-toggle")?.addEventListener("click", () => {
+        const n =
+          document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        document.documentElement.dataset.theme = n;
+        localStorage.setItem("theme", n);
+      });
+      document.querySelectorAll("[data-language]").forEach((link) => {
+        link.addEventListener("click", () => {
+          localStorage.setItem("locale", link.dataset.language);
+        });
+      });
+    </script><script is:inline define:vars={{ detectLanguage }}>
+      const savedLocale = localStorage.getItem("locale");
+      if (savedLocale && !["en", "fr"].includes(savedLocale)) {
+        localStorage.removeItem("locale");
+      }
+
+      if (detectLanguage && !localStorage.getItem("locale")) {
+        const preferred = (navigator.languages || [navigator.language]).find(
+          (language) => language?.toLowerCase().startsWith("fr"),
+        );
+        const target = preferred ? "/fr/" : null;
+        if (target) location.replace(target);
+      }
+    </script></body
+  >
+</html>

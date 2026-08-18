@@ -1,0 +1,15 @@
+---
+title: "Dynamic programming as a proof technique"
+description: "Notes on recurrence relations as inductive arguments."
+published: 2026-06-08
+topics: [Algorithms]
+featured: false
+---
+
+Dynamic programming is usually taught as an optimization: cache the answers to overlapping subproblems. There is another useful lens. A recurrence is also a claim that every large solution decomposes into smaller correct solutions.
+
+## Optimal substructure
+
+For edit distance, let $D(i,j)$ be the minimum cost of transforming the first $i$ symbols of one string into the first $j$ symbols of another. The recurrence enumerates every possible final operation. Correctness follows because an optimal sequence must end with one of them.
+
+This is induction translated into executable form.

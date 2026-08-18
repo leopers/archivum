@@ -1,0 +1,336 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleLayout from "../layouts/ArticleLayout.astro";
+import EntryList from "./EntryList.astro";
+import { localePath, ui, type Locale } from "../i18n/ui";
+
+const { locale, slug = "" } = Astro.props as { locale: Locale; slug?: string };
+const t = ui[locale];
+const writing = (
+  await getCollection("writing", ({ data }) => !data.draft)
+).sort((a, b) => +b.data.published - +a.data.published);
+const projects = await getCollection("projects");
+const musicEntries = (
+  await getCollection("music", ({ data }) => !data.draft)
+).sort((a, b) => +b.data.published - +a.data.published);
+
+const playlists = [
+  {
+    title: "proggers?",
+    id: "3BtORWDAYATz0ZNmMco5xV",
+    description: "Yes, Camel, Gentle Giant, Rush, Eloy.",
+  },
+  {
+    title: "minimal techno",
+    id: "2y3G1lOEELXLwUxrdokBD0",
+    description: "Boris Brejcha, Victor Ruiz, Alex Stein, Ann Clue.",
+  },
+  {
+    title: "Brasa?!?!",
+    id: "3cGleuDmttj6cVmx8hyUIr",
+    description: "Brazilian rock, forró and MPB.",
+  },
+];
+
+const topicDescriptions: Record<Locale, Record<string, string>> = {
+  en: {},
+  fr: {
+    Probability: "Probabilités et statistique.",
+    Optimization: "Méthodes d’optimisation et géométrie.",
+    "Machine Learning": "Méthodes et modèles d’apprentissage.",
+    Algorithms: "Algorithmes et calcul.",
+    "Computer Vision": "Traitement d’images et apprentissage visuel.",
+    Simulation: "Expériences numériques et Monte-Carlo.",
+  },
+};
+
+let articleEntry: any;
+let Content: any;
+if (slug.startsWith("writing/"))
+  articleEntry = writing.find((entry) => entry.id === slug.slice(8));
+if (slug.startsWith("projects/"))
+  articleEntry = projects.find((entry) => entry.id === slug.slice(9));
+if (slug.startsWith("music/"))
+  articleEntry = musicEntries.find((entry) => entry.id === slug.slice(6));
+if (articleEntry) ({ Content } = await render(articleEntry));
+
+const allForTopics = [...writing, ...projects, ...musicEntries];
+const counts = new Map<string, number>();
+allForTopics.forEach((entry) =>
+  entry.data.topics.forEach((topic) =>
+    counts.set(topic, (counts.get(topic) || 0) + 1),
+  ),
+);
+---
+
+{
+  articleEntry && Content ? (
+    <ArticleLayout data={articleEntry.data} locale={locale} englishOnly={true}>
+      <Content />
+    </ArticleLayout>
+  ) : slug === "" ? (
+    <BaseLayout locale={locale} title={`Leonardo Dias — ${t.personalArchive}`}>
+      <section class="home-intro">
+        <div class="home-identity">
+          <>
+            <span class="eyebrow">{t.personalArchive}</span>
+            <h1>Leonardo Dias</h1>
+          </>
+        </div>
+        <div class="home-bio">
+          <>
+            <p>{t.homeBio1}</p>
+            <p>{t.homeBio2}</p>
+          </>
+        </div>
+      </section>
+      <section class="section">
+        <>
+          <div class="section-heading">
+            <>
+              <h2>{t.recentWriting}</h2>
+              <a href={localePath(locale, "writing")}>{t.allNotes} →</a>
+            </>
+          </div>
+          <EntryList entries={writing.slice(0, 3)} locale={locale} />
+        </>
+      </section>
+      <section class="section">
+        <>
+          <div class="section-heading">
+            <>
+              <h2>{t.projects}</h2>
+              <a href={localePath(locale, "projects")}>{t.allProjects} →</a>
+            </>
+          </div>
+          <div class="projects-grid">
+            {projects
+              .filter((project) => project.data.featured)
+              .map((project) => (
+                <a
+                  class="project-card"
+                  href={`${localePath(locale, "projects")}/${project.id}`}
+                >
+                  <span class="eyebrow">{project.data.status}</span>
+                  <h3>{project.data.title}</h3>
+                  <p>{project.data.description}</p>
+                  <footer>
+                    <span>{project.data.topics.join(" · ")}</span>
+                    <span>{project.data.year}</span>
+                  </footer>
+                </a>
+              ))}
+          </div>
+        </>
+      </section>
+    </BaseLayout>
+  ) : slug === "writing" ? (
+    <BaseLayout locale={locale} title={`${t.writingTitle} — Leonardo Dias`}>
+      <>
+        <header class="page-head">
+          <>
+            <div class="eyebrow">{t.writingLabel}</div>
+            <h1>{t.writingTitle}</h1>
+            <p>{t.writingDesc}</p>
+          </>
+        </header>
+        <section class="section">
+          <EntryList entries={writing} locale={locale} />
+        </section>
+      </>
+    </BaseLayout>
+  ) : slug === "projects" ? (
+    <BaseLayout locale={locale} title={`${t.projects} — Leonardo Dias`}>
+      <>
+        <header class="page-head">
+          <>
+            <div class="eyebrow">{t.work}</div>
+            <h1>{t.projects}</h1>
+            <p>{t.projectsDesc}</p>
+          </>
+        </header>
+        <div class="projects-grid" style="margin-bottom:90px">
+          {projects.map((project) => (
+            <a
+              class="project-card"
+              href={`${localePath(locale, "projects")}/${project.id}`}
+            >
+              <span class="eyebrow">{project.data.status}</span>
+              <h3>{project.data.title}</h3>
+              <p>{project.data.description}</p>
+              <footer>
+                <span>{project.data.topics.join(" · ")}</span>
+                <span>{project.data.year}</span>
+              </footer>
+            </a>
+          ))}
+        </div>
+      </>
+    </BaseLayout>
+  ) : slug === "topics" ? (
+    <BaseLayout locale={locale} title={`${t.topics} — Leonardo Dias`}>
+      <>
+        <header class="page-head">
+          <>
+            <div class="eyebrow">{t.index}</div>
+            <h1>{t.topics}</h1>
+            <p>{t.topicsDesc}</p>
+          </>
+        </header>
+        <div class="topic-grid">
+          {[...counts.entries()].sort().map(([topic, count]) => (
+            <section
+              class="topic-card"
+              id={topic.toLowerCase().replaceAll(" ", "-")}
+            >
+              <h2>{topic}</h2>
+              <p>{topicDescriptions[locale][topic] || "Notes et projets."}</p>
+              <span class="tag">
+                {count} {count === 1 ? t.entry : t.entries}
+              </span>
+            </section>
+          ))}
+        </div>
+      </>
+    </BaseLayout>
+  ) : slug === "music" ? (
+    <BaseLayout locale={locale} title={`${t.music} — Leonardo Dias`}>
+      <>
+        <header class="page-head music-head">
+          <>
+            <div class="eyebrow">{t.music}</div>
+            <h1>{t.musicTitle}</h1>
+            <p>{t.musicDesc}</p>
+            <a
+              class="spotify-profile"
+              href="https://open.spotify.com/user/chyf50iwrfskqm5lv5nfjzr7k"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t.spotifyProfile} ↗
+            </a>
+          </>
+        </header>
+        <section class="music-section">
+          <>
+            <div class="section-heading">
+              <h2>{t.featuredPlaylists}</h2>
+            </div>
+            <div class="music-player">
+              <>
+                <div class="playlist-index">
+                  {playlists.map((playlist, index) => (
+                    <button
+                      class="playlist-choice"
+                      type="button"
+                      data-playlist={playlist.id}
+                      aria-pressed={index === 0 ? "true" : "false"}
+                    >
+                      <span class="playlist-number">0{index + 1}</span>
+                      <span>
+                        <strong>{playlist.title}</strong>
+                        <small>{playlist.description}</small>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <iframe
+                  class="spotify-embed"
+                  title="Spotify"
+                  src={`https://open.spotify.com/embed/playlist/${playlists[0].id}?utm_source=generator&theme=0`}
+                  width="100%"
+                  height="500"
+                  allowfullscreen
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                />
+              </>
+            </div>
+          </>
+        </section>
+        <section class="section">
+          <div class="section-heading">
+            <h2>{t.musicWriting}</h2>
+          </div>
+          {musicEntries.length ? (
+            <EntryList entries={musicEntries} type="music" locale={locale} />
+          ) : (
+            <p class="empty-note">{t.musicEmpty}</p>
+          )}
+        </section>
+      </>
+    </BaseLayout>
+  ) : slug === "about" ? (
+    <BaseLayout locale={locale} title={`${t.about} — Leonardo Dias`}>
+      <>
+        <header class="page-head">
+          <>
+            <div class="eyebrow">{t.about}</div>
+            <h1>{t.aboutTitle}</h1>
+            <p>{t.aboutIntro}</p>
+          </>
+        </header>
+        <div class="about-grid">
+          <>
+            <section>
+              <>
+                <h2>{t.background}</h2>
+                <p>{t.background1}</p>
+                <p>{t.background2}</p>
+                <h2>{t.thisArchive}</h2>
+                <p>{t.archiveText}</p>
+              </>
+            </section>
+            <section>
+              <>
+                <h2>{t.outside}</h2>
+                <p>{t.outsideText}</p>
+                <h2>{t.elsewhere}</h2>
+                <p>
+                  <>
+                    <a href="https://github.com/leopers" rel="me">
+                      GitHub ↗
+                    </a>
+                    <br />
+                    <a
+                      href="https://open.spotify.com/user/chyf50iwrfskqm5lv5nfjzr7k"
+                      rel="me"
+                    >
+                      Spotify ↗
+                    </a>
+                  </>
+                </p>
+              </>
+            </section>
+          </>
+        </div>
+      </>
+    </BaseLayout>
+  ) : (
+    <BaseLayout locale={locale}>
+      <header class="page-head">
+        <h1>404</h1>
+      </header>
+    </BaseLayout>
+  )
+}
+
+<script is:inline>
+  const localizedSpotifyFrame = document.querySelector(".spotify-embed");
+  document.querySelectorAll(".playlist-choice").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.playlist;
+      if (!id || !localizedSpotifyFrame) return;
+      document
+        .querySelectorAll(".playlist-choice")
+        .forEach((item) =>
+          item.setAttribute("aria-pressed", String(item === button)),
+        );
+      localizedSpotifyFrame.src =
+        "https://open.spotify.com/embed/playlist/" +
+        id +
+        "?utm_source=generator&theme=0";
+    });
+  });
+</script>

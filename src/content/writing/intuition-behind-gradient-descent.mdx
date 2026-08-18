@@ -1,0 +1,36 @@
+---
+title: "The geometry behind gradient descent"
+description: "A geometric explanation of gradient descent."
+published: 2026-08-12
+topics: [Optimization, Machine Learning]
+featured: true
+---
+
+Optimization is often introduced as an instruction: compute the gradient, step in the opposite direction, repeat. But the instruction hides a choice of geometry.
+
+## The local picture
+
+For a differentiable function $f : \mathbb{R}^n \to \mathbb{R}$, a first-order approximation near $x$ is
+
+$$f(x + \Delta x) \approx f(x) + \nabla f(x)^\top \Delta x.$$
+
+Among all steps with fixed Euclidean length, the change is most negative when $\Delta x$ points against $\nabla f(x)$. This gives the familiar update
+
+$$x_{t+1} = x_t - \eta \nabla f(x_t).$$
+
+The word _Euclidean_ matters. Change the notion of distance and the steepest direction changes too. Natural gradient methods and preconditioning are, in part, ways of choosing a more useful geometry.
+
+## A small implementation
+
+```python
+def gradient_descent(grad, x, step=0.05, iterations=500):
+    history = [x]
+    for _ in range(iterations):
+        x = x - step * grad(x)
+        history.append(x)
+    return x, history
+```
+
+> The gradient is not intrinsically a direction. A metric turns the differential into one.
+
+This viewpoint makes ill-conditioning less mysterious: narrow valleys are places where our default ruler is badly matched to the landscape.
