@@ -642,10 +642,18 @@ $$
 \text{for every }(t,x)\in A.
 $$
 
-Let $\mathrm J_f(t,x)$ denote the Jacobian matrix of $f$ with respect to $x$. Since $f$ is of class $C^1$, the map $(t,x)\mapsto\mathrm J_f(t,x)$ is continuous. It is bounded on $A$, so there exists $C>0$ such that
+Let $\mathrm J_f(t,x)$ denote the Jacobian matrix of $f$ with respect to $x$. For a matrix $L$, we use the norm induced by the Euclidean norm,
 
 $$
-\lVert\mathrm J_f(t,x)\rVert_{\mathrm{op}}
+\lVert L\rVert
+=
+\sup_{|v|=1}|Lv|.
+$$
+
+This is the largest factor by which $L$ can stretch a vector. Since $f$ is of class $C^1$, the map $(t,x)\mapsto\mathrm J_f(t,x)$ is continuous. It is bounded on $A$, so there exists $C>0$ such that
+
+$$
+\lVert\mathrm J_f(t,x)\rVert
 \leq C
 \qquad
 \text{for every }(t,x)\in A.
@@ -658,7 +666,7 @@ $$
 \leq
 \left(
 \sup_{z\in\overline B(x_0,\delta)}
-\lVert\mathrm J_f(t,z)\rVert_{\mathrm{op}}
+\lVert\mathrm J_f(t,z)\rVert
 \right)
 |x-y|
 \leq
