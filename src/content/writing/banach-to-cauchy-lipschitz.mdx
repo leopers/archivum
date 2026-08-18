@@ -97,18 +97,18 @@ $$
 
 and evaluating it at $t=t_0$ gives $x(t_0)=x_0$. Therefore, under the continuity of $f$, the differential and integral formulations are equivalent.
 
-This reformulation does not solve the problem by itself: the unknown function $x$ still appears inside the integral. It does, however, reveal the correct structure. If we define an operator $T$ by
+This reformulation does not solve the problem by itself: the unknown function $x$ still appears inside the integral. It does, however, reveal the correct structure. If we define the Picard operator $\Phi$ on a candidate function $y$ by
 
 $$
-(Tx)(t)
+\Phi(y)(t)
 =
-x_0+\int_{t_0}^{t}f(s,x(s))\,ds,
+x_0+\int_{t_0}^{t}f(s,y(s))\,ds,
 $$
 
 then solving the initial-value problem is exactly the same as finding a function $x$ such that
 
 $$
-Tx=x.
+\Phi(x)=x.
 $$
 
-The differential equation has become a fixed-point problem. The remaining work is to choose a suitable space of functions and determine conditions under which $T$ has one—and only one—fixed point.
+The differential equation has become a fixed-point problem. The remaining work is to choose a suitable space of functions and determine conditions under which $\Phi$ has one—and only one—fixed point.
