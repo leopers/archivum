@@ -143,7 +143,7 @@ export const ui = {
       about: "Sobre",
     },
     footer: "Um caderno vivo.",
-    personalArchive: "Arquivo pessoal",
+    personalArchive: "Aprendizado",
     homeBio1:
       "Brasileiro e atualmente estudante de engenharia na École Polytechnique. Me interesso fortemente pela interseção entre matemática aplicada e computação — do aprendizado de máquina à eletrônica.",
     homeBio2:
