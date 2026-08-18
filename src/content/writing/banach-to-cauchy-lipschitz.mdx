@@ -402,3 +402,208 @@ $$
 Since $k<1$, this is possible only if $d(x,y)=0$. By the separation property of the distance, $x=y$. The fixed point is therefore unique.
 
 Banach’s theorem has now isolated the entire mechanism: the contraction makes the successive approximations a Cauchy sequence, completeness supplies their limit, continuity makes that limit a fixed point, and the same contraction inequality gives uniqueness. It remains to verify these hypotheses for the Picard map associated with the Cauchy problem.
+
+## A precise local existence and uniqueness theorem
+
+We now return to the Cauchy problem
+
+$$
+\begin{cases}
+x'(t)=f(t,x(t)),\\
+x(t_0)=x_0.
+\end{cases}
+$$
+
+The first result is a technical form of the Cauchy–Lipschitz theorem. Its hypotheses are chosen so that Banach’s fixed-point theorem can be applied directly on a suitable space of continuous functions.
+
+Let $\delta>0$ and $(t_0,x_0)\in\mathbb{R}\times\mathbb{R}^n$. Define
+
+$$
+A=
+\left\{
+(t,x)\in\mathbb{R}\times\mathbb{R}^n:
+|t-t_0|\leq\delta,
+\ \lVert x-x_0\rVert\leq\delta
+\right\}.
+$$
+
+Suppose that $f:A\to\mathbb{R}^n$ is continuous and that there exist constants $M>0$ and $C>0$ such that
+
+$$
+\lVert f(t,x)\rVert\leq M
+\qquad
+\text{for every }(t,x)\in A,
+$$
+
+and
+
+$$
+\lVert f(t,x)-f(t,y)\rVert
+\leq
+C\lVert x-y\rVert
+$$
+
+whenever $(t,x),(t,y)\in A$. Thus, $f$ is continuous in $(t,x)$ and Lipschitz continuous with respect to its second variable on $A$.
+
+Set
+
+$$
+T=
+\min\left\{
+\delta,
+\frac{\delta}{2M},
+\frac{1}{2C}
+\right\}
+$$
+
+and
+
+$$
+J=[t_0-T,t_0+T].
+$$
+
+**Theorem.** Under the preceding hypotheses, there exists a unique function $x\in C^1(J;\mathbb{R}^n)$ satisfying
+
+$$
+x'(t)=f(t,x(t)),
+\qquad
+x(t_0)=x_0,
+$$
+
+and
+
+$$
+(t,x(t))\in A
+\qquad
+\text{for every }t\in J.
+$$
+
+The explicit choice of $T$ is not optimal. Its purpose is to make the two estimates required by Banach’s theorem immediate: one estimate ensures that the Picard map sends the chosen function space into itself, and the other makes it contracting.
+
+### The complete metric space
+
+Let
+
+$$
+\overline{B}(x_0,\delta)
+=
+\left\{
+x\in\mathbb{R}^n:
+\lVert x-x_0\rVert\leq\delta
+\right\}
+$$
+
+and define
+
+$$
+E=C\bigl(J;\overline{B}(x_0,\delta)\bigr).
+$$
+
+In other words, $E$ is the set of continuous functions $y:J\to\mathbb{R}^n$ whose values remain in the closed ball $\overline{B}(x_0,\delta)$. We equip $E$ with the distance
+
+$$
+d_\infty(y,z)
+=
+\lVert y-z\rVert_\infty
+=
+\sup_{t\in J}\lVert y(t)-z(t)\rVert.
+$$
+
+The space $E$ is nonempty, since it contains the constant function $t\mapsto x_0$. The metric space $(E,d_\infty)$ is complete. Indeed, $\overline{B}(x_0,\delta)$ is a closed subset of the complete space $\mathbb{R}^n$, and is therefore complete. Since $J$ is compact, a Cauchy sequence in $E$ for $d_\infty$ converges uniformly to a continuous function whose values still belong to $\overline{B}(x_0,\delta)$.
+
+### The Picard map
+
+For $y\in E$, define
+
+$$
+\Phi(y)(t)
+=
+x_0+
+\int_{t_0}^{t}f(s,y(s))\,ds.
+$$
+
+Because $y$ is continuous and $(s,y(s))\in A$ for every $s\in J$, the function $s\mapsto f(s,y(s))$ is continuous. Hence $\Phi(y)$ is a continuous function on $J$.
+
+We must still verify that its values remain in $\overline{B}(x_0,\delta)$. For every $t\in J$,
+
+$$
+\begin{aligned}
+\lVert\Phi(y)(t)-x_0\rVert
+&=
+\left\lVert
+\int_{t_0}^{t}f(s,y(s))\,ds
+\right\rVert\\
+&\leq
+\left|
+\int_{t_0}^{t}\lVert f(s,y(s))\rVert\,ds
+\right|\\
+&\leq
+M|t-t_0|\\
+&\leq
+MT\\
+&\leq
+\frac{\delta}{2}.
+\end{aligned}
+$$
+
+Therefore $\Phi(y)\in E$, and consequently
+
+$$
+\Phi:E\longrightarrow E.
+$$
+
+### The Picard map is contracting
+
+Let $y,z\in E$. For every $t\in J$, the Lipschitz hypothesis on $f$ gives
+
+$$
+\begin{aligned}
+\lVert\Phi(y)(t)-\Phi(z)(t)\rVert
+&=
+\left\lVert
+\int_{t_0}^{t}
+\bigl(f(s,y(s))-f(s,z(s))\bigr)\,ds
+\right\rVert\\
+&\leq
+C\left|
+\int_{t_0}^{t}\lVert y(s)-z(s)\rVert\,ds
+\right|\\
+&\leq
+CT\lVert y-z\rVert_\infty\\
+&\leq
+\frac{1}{2}\lVert y-z\rVert_\infty.
+\end{aligned}
+$$
+
+Taking the supremum over $t\in J$, we obtain
+
+$$
+\lVert\Phi(y)-\Phi(z)\rVert_\infty
+\leq
+\frac{1}{2}\lVert y-z\rVert_\infty.
+$$
+
+Thus $\Phi$ is a contracting map on the nonempty complete metric space $(E,d_\infty)$.
+
+### Conclusion of the proof
+
+Banach’s fixed-point theorem gives a unique $x\in E$ such that
+
+$$
+\Phi(x)=x.
+$$
+
+Equivalently,
+
+$$
+x(t)
+=
+x_0+
+\int_{t_0}^{t}f(s,x(s))\,ds
+\qquad
+\text{for every }t\in J.
+$$
+
+By the equivalence between the differential and integral formulations established earlier, this fixed point belongs to $C^1(J;\mathbb{R}^n)$ and is a solution of the Cauchy problem. The uniqueness of Banach’s fixed point gives uniqueness among the solutions whose graphs remain in $A$ on $J$.
+
+The proof is now complete: the bounds on $f$ determine a time interval on which $\Phi$ is well defined and contracting, while the completeness of $E$ ensures that the method of successive approximations converges to the solution.
