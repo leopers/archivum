@@ -111,10 +111,10 @@ const topicEntryType = (entry: (typeof allForTopics)[number]) =>
           <>
             <p>{t.homeBio1}</p>
             <p>{t.homeBio2}</p>
+            <EducationMarks locale={locale} />
           </>
         </div>
       </section>
-      <EducationMarks locale={locale} />
       {writing.length > 0 && (
         <section class="section">
           <>
