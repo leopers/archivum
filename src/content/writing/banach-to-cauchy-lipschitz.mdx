@@ -18,3 +18,97 @@ While studying differential equations in France, I encountered a different prese
 From this perspective, Picard iteration is no longer an isolated trick. It is simply the repeated application of a contraction, and its convergence follows from the completeness of the underlying function space. Existence and uniqueness are not separate miracles: both are consequences of the same fixed-point principle.
 
 The purpose of this article is to develop this connection carefully. We will first establish Banach’s fixed-point theorem and understand the role played by completeness and contraction. We will then construct the Picard operator associated with an initial-value problem and show how the local Cauchy–Lipschitz theorem follows from it. The goal is to replace an opaque procedure with a clear structural argument—and to make explicit the reasoning that is too often left between the lines.
+
+## The initial-value problem
+
+Let $I\subseteq\mathbb{R}$ be an interval, let $U\subseteq\mathbb{R}^n$ be open, and consider a function
+
+$$
+f:I\times U\longrightarrow\mathbb{R}^n.
+$$
+
+Given an initial time $t_0\in I$ and an initial state $x_0\in U$, we want to study the problem
+
+$$
+\begin{cases}
+x'(t)=f(t,x(t)),\\
+x(t_0)=x_0.
+\end{cases}
+$$
+
+This is called an **initial-value problem**, or a **Cauchy problem**. The function $f$ prescribes a velocity for every admissible pair $(t,x)$. A solution is a curve whose derivative agrees at each instant with the velocity prescribed by $f$.
+
+More precisely, let $J\subseteq I$ be an interval containing $t_0$. A function
+
+$$
+x:J\longrightarrow U
+$$
+
+is a solution on $J$ if $x\in C^1(J,U)$ and
+
+$$
+x(t_0)=x_0,
+\qquad
+x'(t)=f(t,x(t))
+\quad\text{for every }t\in J.
+$$
+
+The interval $J$ is part of the solution. At this stage, there is no reason to expect that a solution will be defined on all of $I$. It may exist only in a neighborhood of $t_0$, or it may cease to remain in $U$ after a finite time. This is why the first theorem we will prove is a **local** result.
+
+There are two logically distinct questions.
+
+**Existence.** Is there an interval $J$ containing $t_0$ on which at least one solution is defined?
+
+**Uniqueness.** If $x_1$ and $x_2$ are two solutions with the same initial condition, must they agree wherever they are both defined near $t_0$?
+
+These questions should not be confused. An equation may admit several solutions through the same point, and it may also fail to admit any solution under insufficient regularity assumptions. The Cauchy–Lipschitz theorem will give conditions on $f$ that guarantee both properties simultaneously.
+
+### From the differential equation to an integral equation
+
+The first important step is elementary but decisive. Suppose that $x$ is a solution on $J$. Integrating the differential equation between $t_0$ and $t$, the fundamental theorem of calculus gives
+
+$$
+x(t)-x(t_0)
+=
+\int_{t_0}^{t}x'(s)\,ds
+=
+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+Using the initial condition $x(t_0)=x_0$, we obtain
+
+$$
+x(t)
+=
+x_0+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+Conversely, suppose that $f$ is continuous and that a continuous function $x:J\to U$ satisfies this integral equation. The map
+
+$$
+t\longmapsto\int_{t_0}^{t}f(s,x(s))\,ds
+$$
+
+is then continuously differentiable. Differentiating the integral equation recovers
+
+$$
+x'(t)=f(t,x(t)),
+$$
+
+and evaluating it at $t=t_0$ gives $x(t_0)=x_0$. Therefore, under the continuity of $f$, the differential and integral formulations are equivalent.
+
+This reformulation does not solve the problem by itself: the unknown function $x$ still appears inside the integral. It does, however, reveal the correct structure. If we define an operator $T$ by
+
+$$
+(Tx)(t)
+=
+x_0+\int_{t_0}^{t}f(s,x(s))\,ds,
+$$
+
+then solving the initial-value problem is exactly the same as finding a function $x$ such that
+
+$$
+Tx=x.
+$$
+
+The differential equation has become a fixed-point problem. The remaining work is to choose a suitable space of functions and determine conditions under which $T$ has one—and only one—fixed point.
