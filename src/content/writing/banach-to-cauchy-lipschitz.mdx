@@ -113,3 +113,102 @@ $$
 $$
 
 The differential equation has become a fixed-point problem. The remaining work is to choose a suitable space of functions and determine conditions under which $\Phi$ has one—and only one—fixed point.
+
+## The space in which Picard iteration lives
+
+The Picard operator does not act on points of $\mathbb{R}^n$. It acts on entire functions. Before asking whether repeated applications of $\Phi$ converge, we therefore need to decide what it means for two functions to be close, and what kind of space can contain their limit.
+
+These questions are expressed through the language of metric spaces.
+
+### Metric spaces
+
+Let $X$ be a set. A **metric** on $X$ is a function
+
+$$
+d:X\times X\longrightarrow[0,+\infty)
+$$
+
+such that, for every $x,y,z\in X$,
+
+$$
+\begin{aligned}
+d(x,y)&=0 \quad\Longleftrightarrow\quad x=y,\\
+d(x,y)&=d(y,x),\\
+d(x,z)&\leq d(x,y)+d(y,z).
+\end{aligned}
+$$
+
+The pair $(X,d)$ is called a **metric space**. The metric contains precisely the information needed to discuss convergence: a sequence $(x_k)_{k\geq 0}$ converges to $x\in X$ when
+
+$$
+d(x_k,x)\longrightarrow 0
+\qquad\text{as }k\longrightarrow\infty.
+$$
+
+For Picard iteration, however, it is not enough to recognize a limit after it has been found. We need a condition that can be checked using the iterates themselves. This leads to the notion of a Cauchy sequence.
+
+A sequence $(x_k)_{k\geq 0}$ in $X$ is a **Cauchy sequence** if, for every $\varepsilon>0$, there exists $N\in\mathbb{N}$ such that
+
+$$
+m,n\geq N
+\quad\Longrightarrow\quad
+d(x_m,x_n)<\varepsilon.
+$$
+
+Thus, the terms eventually become arbitrarily close to one another, without any limit having to be known in advance. Every convergent sequence is Cauchy, but the converse depends on the space.
+
+### Why completeness matters
+
+A metric space $(X,d)$ is **complete** if every Cauchy sequence in $X$ converges to an element of $X$.
+
+This condition prevents a sequence from approaching an object that lies just outside the space. For example, $\mathbb{Q}$ with the usual distance is not complete: a sequence of rational numbers may converge in $\mathbb{R}$ to an irrational number. The sequence is Cauchy in $\mathbb{Q}$, but its limit is absent from $\mathbb{Q}$.
+
+This is exactly the obstruction we must exclude. Picard iteration will produce a sequence of functions
+
+$$
+y_{k+1}=\Phi(y_k).
+$$
+
+The contraction estimate will show that $(y_k)_{k\geq 0}$ is Cauchy. Completeness is what then guarantees that these approximations converge to a function still belonging to the space on which $\Phi$ is defined. Without it, the iteration could become increasingly coherent while failing to produce an admissible solution.
+
+### A complete space of continuous functions
+
+Let
+
+$$
+J=[t_0-a,t_0+a]
+$$
+
+be a compact interval. The natural ambient space for the local problem is
+
+$$
+C(J,\mathbb{R}^n),
+$$
+
+the set of continuous functions from $J$ to $\mathbb{R}^n$. We measure the distance between two functions $y,z\in C(J,\mathbb{R}^n)$ using the uniform norm
+
+$$
+\lVert y-z\rVert_\infty
+=
+\sup_{t\in J}\lVert y(t)-z(t)\rVert.
+$$
+
+This choice is stronger than comparing the functions at a single time: it controls their largest separation over the whole interval. It is also well suited to the Picard operator, because an integral estimate valid for every $t\in J$ immediately becomes an estimate in the uniform norm.
+
+The space $C(J,\mathbb{R}^n)$ is complete with respect to this norm. Indeed, let $(y_k)_{k\geq 0}$ be Cauchy in $\lVert\cdot\rVert_\infty$. For each fixed $t\in J$, the sequence $(y_k(t))_{k\geq 0}$ is Cauchy in $\mathbb{R}^n$, since
+
+$$
+\lVert y_m(t)-y_n(t)\rVert
+\leq
+\lVert y_m-y_n\rVert_\infty.
+$$
+
+Because $\mathbb{R}^n$ is complete, there is a pointwise limit $y(t)\in\mathbb{R}^n$. Moreover, the Cauchy estimate is uniform in $t$, so $y_k\to y$ uniformly on $J$. A uniform limit of continuous functions is continuous; hence $y\in C(J,\mathbb{R}^n)$. Therefore,
+
+$$
+\lVert y_k-y\rVert_\infty\longrightarrow 0,
+$$
+
+which proves completeness.
+
+We now have a space in which a convergent Picard sequence can legitimately produce a continuous function. The next question is what property of $\Phi$ forces that convergence—and makes its limit unique.
