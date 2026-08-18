@@ -1,6 +1,6 @@
 ---
 title: "Finding ODE solutions through fixed points"
-description: "How Banach's fixed-point theorem reveals the structure behind Picard iteration and the Cauchy–Lipschitz theorem."
+description: "How Banach's fixed-point theorem explains Picard's method of successive approximations and the Cauchy–Lipschitz theorem."
 published: 2026-08-18
 topics: [Ordinary Differential Equations, Analysis, Fixed-Point Theory]
 draft: false
@@ -10,15 +10,15 @@ featured: true
 
 ## Motivation
 
-In most undergraduate ODE courses taught in Brazil, existence and uniqueness are presented as facts to be accepted rather than results to be understood. After learning how to solve a few familiar classes of equations, students are introduced to Picard iteration and told that, under suitable assumptions, it converges to a unique solution. The argument is often compressed into a sequence of estimates, leaving the central question unanswered: why should this procedure establish both existence and uniqueness?
+In most undergraduate ODE courses taught in Brazil, existence and uniqueness are presented as facts to be accepted rather than results to be understood. After learning how to solve a few familiar classes of equations, students are introduced to Picard's method of successive approximations and told that, under suitable assumptions, the approximations converge to a unique solution. The argument is often compressed into a sequence of inequalities, leaving the central question unanswered: why should this procedure establish both existence and uniqueness?
 
 This was how I first encountered the subject. The Cauchy–Lipschitz theorem seemed to depend on a clever but rather obscure construction specific to differential equations. Picard’s method produced successive approximations, but the deeper reason for their convergence—and for the uniqueness of their limit—remained hidden behind the calculations.
 
-While studying differential equations in France, I encountered a different presentation. Instead of beginning with Picard iteration, it begins with a general result from analysis: Banach’s fixed-point theorem. An initial-value problem is rewritten as an integral equation, and this equation defines an operator on a suitable space of functions. A solution of the ODE is then precisely a fixed point of this operator.
+While studying differential equations in France, I encountered a different presentation. Instead of beginning directly with Picard's method, it begins with a general result from analysis: Banach’s fixed-point theorem. An initial-value problem is rewritten as an integral equation, and this equation defines a map on a suitable space of functions. A solution of the ODE is then precisely a fixed point of this map.
 
-From this perspective, Picard iteration is no longer an isolated trick. It is simply the repeated application of a contraction, and its convergence follows from the completeness of the underlying function space. Existence and uniqueness are not separate miracles: both are consequences of the same fixed-point principle.
+From this perspective, Picard's method is no longer an isolated trick. It is the method of successive approximations applied to a contraction, and its convergence follows from the completeness of the underlying function space. Existence and uniqueness are not separate miracles: both are consequences of the same fixed-point principle.
 
-The purpose of this article is to develop this connection carefully. We will first establish Banach’s fixed-point theorem and understand the role played by completeness and contraction. We will then construct the Picard operator associated with an initial-value problem and show how the local Cauchy–Lipschitz theorem follows from it. The goal is to replace an opaque procedure with a clear structural argument—and to make explicit the reasoning that is too often left between the lines.
+The purpose of this article is to develop this connection carefully. We will first establish Banach’s fixed-point theorem and understand the role played by completeness and contraction. We will then construct the Picard map associated with an initial-value problem and show how the local Cauchy–Lipschitz theorem follows from it. The goal is to replace an opaque procedure with a clear structural argument—and to make explicit the reasoning that is too often left between the lines.
 
 ## The initial-value problem
 
@@ -98,7 +98,7 @@ $$
 
 and evaluating it at $t=t_0$ gives $x(t_0)=x_0$. Therefore, under the continuity of $f$, the differential and integral formulations are equivalent.
 
-This reformulation does not solve the problem by itself: the unknown function $x$ still appears inside the integral. It does, however, reveal the correct structure. If we define the Picard operator $\Phi$ on a candidate function $y$ by
+This reformulation does not solve the problem by itself: the unknown function $x$ still appears inside the integral. It does, however, reveal the correct structure. Define the Picard map $\Phi$ on a function $y$ by
 
 $$
 \Phi(y)(t)
@@ -114,64 +114,80 @@ $$
 
 The differential equation has become a fixed-point problem. The remaining work is to choose a suitable space of functions and determine conditions under which $\Phi$ has one—and only one—fixed point.
 
-## The space in which Picard iteration lives
+## Metric and complete spaces
 
-The Picard operator does not act on points of $\mathbb{R}^n$. It acts on entire functions. Before asking whether repeated applications of $\Phi$ converge, we therefore need to decide what it means for two functions to be close, and what kind of space can contain their limit.
+The map $\Phi$ acts on functions, not on points of $\mathbb{R}^n$. We must therefore place these functions in a space equipped with a notion of distance.
 
-These questions are expressed through the language of metric spaces.
+### Distances and metric spaces
 
-### Metric spaces
-
-Let $X$ be a set. A **metric** on $X$ is a function
+Let $X$ be a set and let
 
 $$
 d:X\times X\longrightarrow[0,+\infty)
 $$
 
-such that, for every $x,y,z\in X$,
+be a map. We say that $d$ is a **distance** on $X$ if, for all $x,y,z\in X$,
 
 $$
 \begin{aligned}
-d(x,y)&=0 \quad\Longleftrightarrow\quad x=y,\\
-d(x,y)&=d(y,x),\\
-d(x,z)&\leq d(x,y)+d(y,z).
+d(x,y)=0 &\quad\Longleftrightarrow\quad x=y &&\text{(separation)},\\
+d(x,y)&=d(y,x) &&\text{(symmetry)},\\
+d(x,z)&\leq d(x,y)+d(y,z) &&\text{(triangle inequality)}.
 \end{aligned}
 $$
 
-The pair $(X,d)$ is called a **metric space**. The metric contains precisely the information needed to discuss convergence: a sequence $(x_k)_{k\geq 0}$ converges to $x\in X$ when
+The pair $(X,d)$ is then called a **metric space**.
+
+A sequence $(x_n)_{n\geq 0}$ in $X$ converges to $x\in X$ if
 
 $$
-d(x_k,x)\longrightarrow 0
-\qquad\text{as }k\longrightarrow\infty.
+d(x_n,x)\longrightarrow 0
+\qquad\text{as }n\longrightarrow+\infty.
 $$
 
-For Picard iteration, however, it is not enough to recognize a limit after it has been found. We need a condition that can be checked using the iterates themselves. This leads to the notion of a Cauchy sequence.
-
-A sequence $(x_k)_{k\geq 0}$ in $X$ is a **Cauchy sequence** if, for every $\varepsilon>0$, there exists $N\in\mathbb{N}$ such that
+It is called a **Cauchy sequence** if
 
 $$
-m,n\geq N
+\forall\varepsilon>0,\quad
+\exists n_0\in\mathbb{N},\quad
+\forall n,m\geq n_0,\quad
+d(x_n,x_m)<\varepsilon.
+$$
+
+Every convergent sequence is a Cauchy sequence. Indeed, suppose that $x_n\to x$. Given $\varepsilon>0$, there exists $n_0\in\mathbb{N}$ such that
+
+$$
+n\geq n_0
 \quad\Longrightarrow\quad
-d(x_m,x_n)<\varepsilon.
+d(x_n,x)<\frac{\varepsilon}{2}.
 $$
 
-Thus, the terms eventually become arbitrarily close to one another, without any limit having to be known in advance. Every convergent sequence is Cauchy, but the converse depends on the space.
-
-### Why completeness matters
-
-A metric space $(X,d)$ is **complete** if every Cauchy sequence in $X$ converges to an element of $X$.
-
-This condition prevents a sequence from approaching an object that lies just outside the space. For example, $\mathbb{Q}$ with the usual distance is not complete: a sequence of rational numbers may converge in $\mathbb{R}$ to an irrational number. The sequence is Cauchy in $\mathbb{Q}$, but its limit is absent from $\mathbb{Q}$.
-
-This is exactly the obstruction we must exclude. Picard iteration will produce a sequence of functions
+Hence, for all $n,m\geq n_0$, the triangle inequality gives
 
 $$
-y_{k+1}=\Phi(y_k).
+d(x_n,x_m)
+\leq d(x_n,x)+d(x,x_m)
+<\varepsilon.
 $$
 
-The contraction estimate will show that $(y_k)_{k\geq 0}$ is Cauchy. Completeness is what then guarantees that these approximations converge to a function still belonging to the space on which $\Phi$ is defined. Without it, the iteration could become increasingly coherent while failing to produce an admissible solution.
+The converse is not true in every metric space. This leads to the notion of completeness.
 
-### A complete space of continuous functions
+### Complete metric spaces
+
+A metric space $(X,d)$ is said to be **complete** if every Cauchy sequence in $X$ converges in $X$.
+
+The final words matter: the limit must belong to the space itself. For example, $\mathbb{Q}$ with the usual distance is not complete, since a sequence of rational numbers can be Cauchy and converge in $\mathbb{R}$ to an irrational number.
+
+Completeness will be the hypothesis that turns successive approximations into an actual fixed point. Starting from an arbitrary $x_0\in X$, Banach’s theorem considers the sequence defined by
+
+$$
+x_{n+1}=f(x_n),
+\qquad n\geq 0.
+$$
+
+The proof will show that $(x_n)_{n\geq 0}$ is a Cauchy sequence. If $X$ is complete, it follows that this sequence converges to some $x_\infty\in X$.
+
+### The Banach space of continuous functions
 
 Let
 
@@ -179,36 +195,64 @@ $$
 J=[t_0-a,t_0+a]
 $$
 
-be a compact interval. The natural ambient space for the local problem is
+be a compact interval. We denote by
 
 $$
-C(J,\mathbb{R}^n),
+C(J;\mathbb{R}^n)
 $$
 
-the set of continuous functions from $J$ to $\mathbb{R}^n$. We measure the distance between two functions $y,z\in C(J,\mathbb{R}^n)$ using the uniform norm
+the vector space of continuous functions from $J$ to $\mathbb{R}^n$. On this space, consider the norm of uniform convergence
 
 $$
+\lVert y\rVert_\infty
+=
+\sup_{t\in J}\lVert y(t)\rVert.
+$$
+
+The associated distance is
+
+$$
+d_\infty(y,z)
+=
 \lVert y-z\rVert_\infty
 =
 \sup_{t\in J}\lVert y(t)-z(t)\rVert.
 $$
 
-This choice is stronger than comparing the functions at a single time: it controls their largest separation over the whole interval. It is also well suited to the Picard operator, because an integral estimate valid for every $t\in J$ immediately becomes an estimate in the uniform norm.
-
-The space $C(J,\mathbb{R}^n)$ is complete with respect to this norm. Indeed, let $(y_k)_{k\geq 0}$ be Cauchy in $\lVert\cdot\rVert_\infty$. For each fixed $t\in J$, the sequence $(y_k(t))_{k\geq 0}$ is Cauchy in $\mathbb{R}^n$, since
+A complete normed vector space is called a **Banach space**. The space
 
 $$
-\lVert y_m(t)-y_n(t)\rVert
+\bigl(C(J;\mathbb{R}^n),\lVert\cdot\rVert_\infty\bigr)
+$$
+
+is a Banach space.
+
+To verify this, let $(y_n)_{n\geq 0}$ be a Cauchy sequence for the norm $\lVert\cdot\rVert_\infty$. For every $t\in J$ and all $n,m\geq 0$,
+
+$$
+\lVert y_n(t)-y_m(t)\rVert
 \leq
-\lVert y_m-y_n\rVert_\infty.
+\lVert y_n-y_m\rVert_\infty.
 $$
 
-Because $\mathbb{R}^n$ is complete, there is a pointwise limit $y(t)\in\mathbb{R}^n$. Moreover, the Cauchy estimate is uniform in $t$, so $y_k\to y$ uniformly on $J$. A uniform limit of continuous functions is continuous; hence $y\in C(J,\mathbb{R}^n)$. Therefore,
+Thus, for every fixed $t\in J$, the sequence $(y_n(t))_{n\geq 0}$ is Cauchy in $\mathbb{R}^n$. Since $\mathbb{R}^n$ is complete, we may define
 
 $$
-\lVert y_k-y\rVert_\infty\longrightarrow 0,
+y(t)=\lim_{n\to+\infty}y_n(t).
 $$
 
-which proves completeness.
+Now let $\varepsilon>0$. Since $(y_n)_{n\geq 0}$ is Cauchy for $\lVert\cdot\rVert_\infty$, there exists $n_0\in\mathbb{N}$ such that, for all $n,m\geq n_0$,
 
-We now have a space in which a convergent Picard sequence can legitimately produce a continuous function. The next question is what property of $\Phi$ forces that convergence—and makes its limit unique.
+$$
+\lVert y_n-y_m\rVert_\infty<\varepsilon.
+$$
+
+Letting $m\to+\infty$ yields, for every $n\geq n_0$,
+
+$$
+\lVert y_n-y\rVert_\infty\leq\varepsilon.
+$$
+
+Therefore $y_n\to y$ uniformly on $J$. Since a uniform limit of continuous functions is continuous, $y\in C(J;\mathbb{R}^n)$. This proves that the space is complete.
+
+This is the space in which we will apply the method of successive approximations to the Picard map $\Phi$. The next step is to define a contraction and prove Banach’s fixed-point theorem.
