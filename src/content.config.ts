@@ -14,17 +14,24 @@ const writing = defineCollection({
   }),
 });
 
+const projectSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  year: z.number(),
+  topics: z.array(z.string()),
+  status: z.enum(["ongoing", "complete", "archived"]),
+  featured: z.boolean().default(false),
+  repo: z.string().url().optional(),
+});
+
 const projects = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects" }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    year: z.number(),
-    topics: z.array(z.string()),
-    status: z.enum(["ongoing", "complete", "archived"]),
-    featured: z.boolean().default(false),
-    repo: z.string().url().optional(),
-  }),
+  schema: projectSchema,
+});
+
+const projectsFr = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects-fr" }),
+  schema: projectSchema,
 });
 
 const music = defineCollection({
@@ -38,4 +45,4 @@ const music = defineCollection({
   }),
 });
 
-export const collections = { writing, projects, music };
+export const collections = { writing, projects, projectsFr, music };

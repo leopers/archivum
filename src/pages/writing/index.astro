@@ -13,6 +13,12 @@ const entries = (
       Notes from my studies.
     </p>
   </header><section class="section">
-    <EntryList entries={entries} />
+    {
+      entries.length > 0 ? (
+        <EntryList entries={entries} />
+      ) : (
+        <p class="empty-note">No notes published yet.</p>
+      )
+    }
   </section></BaseLayout
 >

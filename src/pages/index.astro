@@ -28,11 +28,21 @@ const projects = (await getCollection("projects")).filter(
         thinking about, with the occasional detour into music.
       </p>
     </div>
-  </section><section class="section">
-    <div class="section-heading">
-      <h2>Recent writing</h2><a href="/writing">All notes →</a>
-    </div><EntryList entries={writing} />
-  </section><section class="section">
+  </section>{
+    writing.length > 0 && (
+      <section class="section">
+        <>
+          <div class="section-heading">
+            <>
+              <h2>Recent writing</h2>
+              <a href="/writing">All notes →</a>
+            </>
+          </div>
+          <EntryList entries={writing} />
+        </>
+      </section>
+    )
+  }<section class="section">
     <div class="section-heading">
       <h2>Projects</h2><a href="/projects">All projects →</a>
     </div><div class="projects-grid">

@@ -308,6 +308,9 @@ h3 {
   justify-content: center;
   padding: 84px 0 100px;
 }
+.article-wrap > article {
+  min-width: 0;
+}
 .article-head {
   margin-bottom: 55px;
 }
@@ -341,6 +344,7 @@ h3 {
   font-size: 0.78rem;
 }
 .prose {
+  min-width: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.09rem;
   line-height: 1.82;
@@ -380,7 +384,68 @@ h3 {
 .prose .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.9em 0;
+  margin: 1.45rem 0;
+  padding: 0.35rem 0 0.45rem;
+  font-size: 0.86em;
+  line-height: 1.35;
+  text-align: center;
+}
+.prose .katex-display > .katex {
+  text-align: center;
+}
+.prose .katex .tag {
+  display: initial;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+}
+.prose .katex-display > .katex > .katex-html > .tag {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.88em;
+}
+.prose table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 2rem 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-family: system-ui, sans-serif;
+  font-size: 0.86rem;
+}
+.prose th,
+.prose td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.prose th:not(:first-child),
+.prose td:not(:first-child) {
+  text-align: right;
+}
+.project-figure {
+  margin: 3rem 0;
+}
+.project-figure img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.project-figure figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.5;
 }
 .aside {
   position: sticky;
@@ -495,19 +560,51 @@ h3 {
   font-size: 0.76rem;
   color: var(--muted);
 }
+@media (max-width: 1020px) {
+  .article-wrap {
+    grid-template-columns: minmax(0, 720px);
+    gap: 0;
+  }
+  .article-wrap > article {
+    width: 100%;
+    justify-self: center;
+  }
+  .aside {
+    display: none;
+  }
+}
 @media (max-width: 760px) {
+  .prose .katex-display {
+    margin: 1.2rem 0;
+    padding-right: 1.8rem;
+    font-size: 0.78em;
+    text-align: left;
+  }
+  .prose .katex-display > .katex {
+    min-width: max-content;
+    text-align: left;
+  }
+  .prose .katex-display > .katex > .katex-html > .tag {
+    right: 0;
+  }
   .shell {
     width: min(100% - 28px, 1160px);
   }
   .site-header {
+    flex-direction: column;
     height: auto;
     padding: 20px 0;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 15px;
+  }
+  .brand {
+    white-space: nowrap;
   }
   .nav {
-    gap: 13px;
+    gap: 9px 13px;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    font-size: 0.76rem;
   }
   .home-intro {
     grid-template-columns: 1fr;
@@ -536,10 +633,31 @@ h3 {
   }
   .article-wrap {
     grid-template-columns: 1fr;
-    padding-top: 55px;
+    padding: 48px 0 72px;
   }
-  .aside {
-    display: none;
+  .article-head {
+    margin-bottom: 42px;
+  }
+  .article-head h1 {
+    margin: 12px 0 18px;
+    font-size: clamp(2.35rem, 12vw, 3.3rem);
+    line-height: 1.02;
+  }
+  .article-sub {
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+  .prose {
+    font-size: 1rem;
+    line-height: 1.72;
+  }
+  .prose h2 {
+    font-size: 1.65rem;
+  }
+  .prose pre {
+    margin-inline: -0.2rem;
+    padding: 16px;
+    font-size: 0.75rem;
   }
   .page-head {
     padding-top: 62px;

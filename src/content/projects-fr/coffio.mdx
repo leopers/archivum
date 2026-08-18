@@ -1,0 +1,166 @@
+---
+title: "Coffio"
+description: "Un contrôleur Wi-Fi qui transforme une cafetière classique en appareil connecté et programmable."
+year: 2025
+topics: [Embedded Systems, Internet of Things, C++]
+status: complete
+featured: true
+repo: "https://github.com/leopers/coffio"
+---
+
+import CoffioPreview from "../../components/CoffioPreview.astro";
+
+Coffio ajoute une interface réseau à une cafetière classique munie d'un interrupteur mécanique. Un ESP8266 commande la machine à travers un relais et héberge une petite application web adaptée au téléphone. Il devient ainsi possible de lancer immédiatement la préparation du café ou de la programmer pour plus tard.
+
+L'appareil est autonome : le firmware, le serveur HTTP, le planificateur et l'interface web fonctionnent tous sur l'ESP8266. Aucun service cloud ni application native n'est nécessaire.
+
+<CoffioPreview />
+
+## La boucle de contrôle
+
+Le point d'entrée initialise le relais, connecte la carte au réseau Wi-Fi, monte le système de fichiers LittleFS et démarre les deux sous-systèmes principaux.
+
+```cpp
+void setup() {
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED && retry < 30) {
+    delay(500);
+    retry++;
+  }
+
+  LittleFS.begin();
+  setupWebServer(RELAY_PIN);
+  setupScheduler(RELAY_PIN);
+}
+```
+
+Mettre la sortie du relais à l'état bas avant toute opération réseau est important : la cafetière démarre dans un état connu et reste éteinte même si la connexion Wi-Fi échoue. Les identifiants du réseau sont conservés dans un fichier local `secrets.h`, exclu du dépôt Git.
+
+Après l'initialisation, la carte traite continuellement les requêtes HTTP, vérifie la programmation et surveille la préparation en cours. Ces tâches partagent une seule boucle événementielle plutôt que plusieurs threads. Dans l'extrait suivant, j'ai donné un nom à la durée afin de rendre la logique plus lisible.
+
+```cpp
+void loop() {
+  handleWebRequests();
+  checkAndTriggerSchedule(RELAY_PIN);
+
+  if (isBrewing && millis() - brewStartTime >= BREW_DURATION) {
+    digitalWrite(RELAY_PIN, LOW);
+    isBrewing = false;
+  }
+}
+```
+
+L'état repose sur deux valeurs : `isBrewing` indique si le relais est actif, tandis que `brewStartTime` mémorise l'instant de son activation. La comparaison entre `millis()` et cet instant permet d'arrêter la préparation sans utiliser un long `delay()`. Le serveur reste donc disponible pendant que la cafetière fonctionne.
+
+## Transformer une requête HTTP en action physique
+
+L'ESP8266 exécute un serveur web sur le port 80. Une requête vers `/on` ferme le relais et mémorise le début de la préparation.
+
+```cpp
+server.on("/on", HTTP_GET, [relayPin]() {
+  if (!isBrewing) {
+    digitalWrite(relayPin, HIGH);
+    isBrewing = true;
+    brewStartTime = millis();
+    server.send(200, "text/plain", "Brewing");
+  } else {
+    server.send(400, "text/plain", "Already brewing");
+  }
+});
+```
+
+La condition empêche des appuis répétés de relancer le minuteur ou de modifier un état déjà actif. Les routes `/off` et `/cancel` effectuent l'opération inverse : elles ouvrent le relais et réinitialisent l'état.
+
+La programmation utilise une autre route très simple. Le navigateur envoie une heure au format `HH:MM`, que le contrôleur conserve en mémoire :
+
+```cpp
+server.on("/schedule", HTTP_GET, []() {
+  if (server.hasArg("time")) {
+    scheduledTime = server.arg("time");
+    server.send(200, "text/plain", "Scheduled");
+  } else {
+    server.send(400, "text/plain", "Missing time");
+  }
+});
+```
+
+Il s'agit volontairement d'une API locale minimale. La programmation est volatile : un redémarrage ou une déconnexion de la carte l'efface. Une version plus robuste pourrait valider la valeur reçue et l'enregistrer dans la mémoire flash.
+
+## Synchroniser et vérifier l'heure
+
+L'ESP8266 ne possède pas d'horloge temps réel sauvegardée par batterie. Coffio récupère donc l'heure auprès de serveurs NTP après sa connexion au réseau :
+
+```cpp
+void setupScheduler(int relayPin) {
+  configTime(-3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  while (time(nullptr) < 100000) {
+    delay(500);
+  }
+}
+```
+
+Dans cette première version, le décalage est fixé à UTC−3, le fuseau horaire dans lequel j'utilisais initialement l'appareil. À chaque passage dans la boucle, le programme convertit l'horloge synchronisée au format `HH:MM` et la compare avec l'heure demandée.
+
+```cpp
+void checkAndTriggerSchedule(int relayPin) {
+  static String lastCheckedTime = "";
+  String now = getCurrentTime();
+
+  if (now != lastCheckedTime) {
+    lastCheckedTime = now;
+
+    if (scheduledTime.length() && now == scheduledTime) {
+      digitalWrite(relayPin, HIGH);
+      isBrewing = true;
+      brewStartTime = millis();
+      scheduledTime = "";
+    }
+  }
+}
+```
+
+`lastCheckedTime` limite la comparaison à une fois par minute au lieu de l'effectuer à chaque cycle du processeur. Effacer `scheduledTime` après une correspondance rend également la programmation unique : elle ne peut pas se déclencher une seconde fois lors de l'itération suivante.
+
+## Héberger l'interface sur le microcontrôleur
+
+Le frontend est stocké dans la mémoire flash de l'ESP8266 et servi directement par l'appareil :
+
+```cpp
+server.serveStatic("/", LittleFS, "/index.html");
+server.serveStatic("/style.css", LittleFS, "/style.css");
+server.serveStatic("/script.js", LittleFS, "/script.js");
+server.serveStatic("/cat.jpg", LittleFS, "/cat.jpg");
+```
+
+Cette solution supprime le besoin d'un backend externe. Le document HTML fournit également un manifeste d'application web et les métadonnées nécessaires à iOS, ce qui permet d'ajouter le contrôleur à l'écran d'accueil d'un téléphone.
+
+Le navigateur doit seulement traduire les actions de l'interface en requêtes adressées à la carte :
+
+```js
+document.getElementById("makeCoffeeBtn").onclick = () => {
+  fetch("/on")
+    .then(() => startCountdown(600))
+    .catch(() => updateStatus("Failed to start brew."));
+};
+
+document.getElementById("scheduleBtn").onclick = () => {
+  const time = document.getElementById("scheduleTime").value;
+  if (!time) return;
+
+  fetch(`/schedule?time=${encodeURIComponent(time)}`).then(() =>
+    updateStatus(`Coffee scheduled for ${time}.`),
+  );
+};
+```
+
+Le compte à rebours affiché dans le navigateur n'est qu'une représentation locale de la progression ; le firmware reste l'autorité sur le relais. Cette séparation est essentielle, car fermer la page ne doit pas interrompre une préparation déjà lancée.
+
+## Ce que j'ai appris
+
+Coffio m'a permis d'aborder un système embarqué comme un produit complet plutôt que comme un circuit isolé. La principale difficulté consistait à coordonner l'état physique, les requêtes réseau, la synchronisation du temps et une interface utilisable, le tout dans les limites d'un petit microcontrôleur.
+
+Le prototype indique aussi clairement les prochaines étapes techniques : rendre les programmations persistantes, configurer le fuseau horaire, authentifier les routes de contrôle, permettre les mises à jour à distance et fournir des réponses d'état afin que le navigateur puisse lire la situation réelle de l'appareil.

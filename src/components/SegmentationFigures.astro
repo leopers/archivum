@@ -1,0 +1,243 @@
+---
+type Kind = "training" | "distributions" | "qualitative";
+
+const { kind, locale = "en" } = Astro.props as { kind: Kind; locale?: string };
+const fr = locale === "fr";
+const base = "/projects/semantic-seg-comparison/results";
+
+const training = [
+  {
+    file: "loss-curve.png",
+    en: "Binary cross-entropy",
+    fr: "Entropie croisée binaire",
+  },
+  {
+    file: "accuracy-curve.png",
+    en: "Pixel accuracy",
+    fr: "Précision par pixel",
+  },
+  {
+    file: "iou-curve.png",
+    en: "Intersection over Union",
+    fr: "Intersection sur Union",
+  },
+];
+
+const distributions = [
+  {
+    file: "grabcut-accuracy-distribution.png",
+    method: "GrabCut",
+    metric: fr ? "Précision" : "Accuracy",
+  },
+  {
+    file: "unet-accuracy-distribution.png",
+    method: "U-Net",
+    metric: fr ? "Précision" : "Accuracy",
+  },
+  { file: "grabcut-iou-distribution.png", method: "GrabCut", metric: "IoU" },
+  { file: "unet-iou-distribution.png", method: "U-Net", metric: "IoU" },
+];
+---
+
+{
+  kind === "training" && (
+    <figure class="experiment-figure full-bleed">
+      <div class="figure-heading">
+        <span class="eyebrow">
+          {fr ? "Dynamique d’apprentissage" : "Training dynamics"}
+        </span>
+        <h3>
+          {fr
+            ? "Convergence au cours des 20 époques"
+            : "Convergence over 20 epochs"}
+        </h3>
+        <p>
+          {fr
+            ? "Les courbes d’entraînement et de validation restent proches pendant que la perte diminue et que les deux métriques progressent."
+            : "Training and validation remain close while loss falls and both segmentation metrics improve."}
+        </p>
+      </div>
+      <div class="training-grid">
+        {training.map((item) => (
+          <figure class="plot-card">
+            <img
+              src={`${base}/${item.file}`}
+              alt={fr ? item.fr : item.en}
+              loading="lazy"
+            />
+            <figcaption>{fr ? item.fr : item.en}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </figure>
+  )
+}
+
+{
+  kind === "distributions" && (
+    <figure class="experiment-figure full-bleed">
+      <div class="figure-heading">
+        <span class="eyebrow">
+          {fr ? "Résultats image par image" : "Per-image results"}
+        </span>
+        <h3>
+          {fr
+            ? "Distribution des scores de validation"
+            : "Validation-score distributions"}
+        </h3>
+        <p>
+          {fr
+            ? "Les histogrammes révèlent ce que les moyennes masquent : GrabCut présente davantage d’échecs sévères, surtout en IoU."
+            : "The histograms show what the averages conceal: GrabCut has more severe failures, especially in IoU."}
+        </p>
+      </div>
+      <div class="distribution-grid">
+        {distributions.map((item) => (
+          <figure class="plot-card">
+            <img
+              src={`${base}/${item.file}`}
+              alt={`${item.method} — ${item.metric}`}
+              loading="lazy"
+            />
+            <figcaption>
+              <strong>{item.method}</strong>
+              <span>{item.metric}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </figure>
+  )
+}
+
+{
+  kind === "qualitative" && (
+    <figure class="experiment-figure qualitative full-bleed">
+      <div class="figure-heading">
+        <span class="eyebrow">
+          {fr ? "Inspection qualitative" : "Qualitative inspection"}
+        </span>
+        <h3>
+          {fr
+            ? "Deux images, quatre niveaux de lecture"
+            : "Two images, four views"}
+        </h3>
+        <p>
+          {fr
+            ? "De haut en bas : image originale, vérité terrain, prédiction du U-Net et résultat de GrabCut. Le réseau récupère mieux la forme globale, mais ses frontières restent imparfaites à 128 × 128."
+            : "Top to bottom: original image, ground truth, U-Net prediction, and GrabCut result. The network recovers the overall shape more reliably, although its boundaries remain imperfect at 128 × 128."}
+        </p>
+      </div>
+      <div class="qualitative-image">
+        <img
+          src={`${base}/qualitative-comparison.png`}
+          alt={
+            fr
+              ? "Comparaison qualitative entre U-Net et GrabCut sur deux images de chats"
+              : "Qualitative comparison of U-Net and GrabCut on two cat images"
+          }
+          loading="lazy"
+        />
+      </div>
+    </figure>
+  )
+}
+
+<style>
+  .experiment-figure {
+    margin: 3rem 0;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper) 96%, var(--ink));
+    font-family: system-ui, sans-serif;
+  }
+  .figure-heading {
+    padding: 1.45rem 1.6rem 1.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .figure-heading h3 {
+    margin: 0.42rem 0 0.35rem;
+    font-family: Georgia, serif;
+    font-size: 1.45rem;
+    font-weight: 500;
+  }
+  .figure-heading p {
+    max-width: 68ch;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+  .training-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .distribution-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .plot-card {
+    min-width: 0;
+    margin: 0;
+    padding: 1rem;
+  }
+  .plot-card + .plot-card {
+    border-left: 1px solid var(--line);
+  }
+  .distribution-grid .plot-card:nth-child(3),
+  .distribution-grid .plot-card:nth-child(4) {
+    border-top: 1px solid var(--line);
+  }
+  .distribution-grid .plot-card:nth-child(3) {
+    border-left: 0;
+  }
+  .plot-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fff;
+  }
+  .plot-card figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.65rem;
+    color: var(--muted);
+    font-size: 0.7rem;
+  }
+  .plot-card figcaption strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .qualitative-image {
+    padding: 1.4rem;
+    background: #fff;
+  }
+  .qualitative-image img {
+    display: block;
+    width: min(100%, 720px);
+    height: auto;
+    margin: 0 auto;
+  }
+  @media (min-width: 980px) {
+    .full-bleed {
+      width: min(1040px, calc(100vw - 3rem));
+      margin-left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+  @media (max-width: 760px) {
+    .training-grid,
+    .distribution-grid {
+      grid-template-columns: 1fr;
+    }
+    .plot-card + .plot-card,
+    .distribution-grid .plot-card:nth-child(3),
+    .distribution-grid .plot-card:nth-child(4) {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+    .qualitative-image {
+      padding: 0.65rem;
+    }
+  }
+</style>
