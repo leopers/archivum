@@ -63,7 +63,7 @@ export const ui = {
     outsideText:
       "Music is the other constant in my life. I’m an amateur guitarist and an enthusiastic listener, moving freely between indie, progressive rock, metal, techno, trance, and whatever else catches my ear.",
     elsewhere: "Elsewhere",
-    researchNote: "Research note",
+    researchNote: "Writing",
     project: "Project",
     sourceCode: "Source code",
     filedUnder: "Filed under",
@@ -125,7 +125,7 @@ export const ui = {
     outsideText:
       "La musique est l’autre constante de ma vie. Guitariste amateur et auditeur curieux, je passe volontiers de l’indie au rock progressif, du metal à la techno ou à la trance, selon le moment.",
     elsewhere: "Ailleurs",
-    researchNote: "Note d’étude",
+    researchNote: "Texte",
     project: "Projet",
     sourceCode: "Code source",
     filedUnder: "Sujets",

@@ -20,9 +20,9 @@ const date = data.published
   ><div class="article-wrap">
     <article>
       <header class="article-head">
-        <div class="eyebrow">
-          {data.published ? t.researchNote : t.project}
-        </div><h1>{data.title}</h1><div class="article-sub">
+        {!data.published && <div class="eyebrow">{t.project}</div>}<h1
+          >{data.title}</h1
+        ><div class="article-sub">
           {data.description}
         </div><div class="article-meta">{date} · {data.topics.join(" / ")}</div>
         {
