@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import EntryList from "../components/EntryList.astro";
 import LivingCircuit from "../components/LivingCircuit.astro";
+import EducationMarks from "../components/EducationMarks.astro";
 const writing = (await getCollection("writing", ({ data }) => !data.draft))
   .sort((a, b) => +b.data.published - +a.data.published)
   .slice(0, 3);
@@ -30,7 +31,8 @@ const projects = (await getCollection("projects")).filter(
         thinking about, with the occasional detour into music.
       </p>
     </div>
-  </section>{
+  </section>
+  <EducationMarks />{
     writing.length > 0 && (
       <section class="section">
         <>

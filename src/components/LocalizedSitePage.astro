@@ -4,6 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleLayout from "../layouts/ArticleLayout.astro";
 import EntryList from "./EntryList.astro";
 import LivingCircuit from "./LivingCircuit.astro";
+import EducationMarks from "./EducationMarks.astro";
 import AboutField from "./AboutField.astro";
 import { localePath, ui, type Locale } from "../i18n/ui";
 
@@ -113,6 +114,7 @@ const topicEntryType = (entry: (typeof allForTopics)[number]) =>
           </>
         </div>
       </section>
+      <EducationMarks locale={locale} />
       {writing.length > 0 && (
         <section class="section">
           <>
