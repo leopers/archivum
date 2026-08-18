@@ -1,0 +1,43 @@
+---
+interface Props {
+  locale?: "en" | "fr";
+}
+
+const { locale = "en" } = Astro.props;
+const label = locale === "fr" ? "Formation" : "Education";
+---
+
+<aside class="education-marks" aria-label={label}>
+  <div class="education-list">
+    <a
+      class="education-mark education-mark--x"
+      href="https://www.polytechnique.edu/"
+      target="_blank"
+      rel="noreferrer"
+      aria-label="École Polytechnique"
+    >
+      <img
+        src="/institutions/ecole-polytechnique.png"
+        width="420"
+        height="468"
+        alt="École Polytechnique"
+      />
+      <span>Cycle Ingénieur · Current</span>
+    </a>
+    <a
+      class="education-mark education-mark--ita"
+      href="https://www.ita.br/"
+      target="_blank"
+      rel="noreferrer"
+      aria-label="Instituto Tecnológico de Aeronáutica"
+    >
+      <img
+        src="/institutions/ita.webp"
+        width="500"
+        height="190"
+        alt="ITA — Instituto Tecnológico de Aeronáutica"
+      />
+      <span>Computer Engineering</span>
+    </a>
+  </div>
+</aside>

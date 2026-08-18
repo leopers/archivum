@@ -1,6 +1,9 @@
 ---
 import { getCollection, render } from "astro:content";
 import ArticleLayout from "../../layouts/ArticleLayout.astro";
+
+export const prerender = true;
+
 export async function getStaticPaths() {
   return (await getCollection("projects")).map((entry) => ({
     params: { id: entry.id },

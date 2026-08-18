@@ -1,11 +1,14 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
+import cloudflare from "@astrojs/cloudflare";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
 export default defineConfig({
-  site: "https://leopers.github.io/archivum",
+  output: "server",
+  adapter: cloudflare({ imageService: "passthrough" }),
+  site: "https://leopers.dev",
   i18n: {
     locales: ["en", "fr"],
     defaultLocale: "en",
