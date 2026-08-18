@@ -1,0 +1,250 @@
+<figure class="coffio-demo" data-coffio-demo>
+  <figcaption>
+    <span>Interface preview</span>
+    <span>Interactive demonstration · no device connected</span>
+  </figcaption>
+
+  <div class="browser-bar" aria-hidden="true">
+    <i></i><i></i><i></i>
+    <span>coffio.local</span>
+  </div>
+
+  <div class="coffio-screen">
+    <div class="coffio-card">
+      <div class="mascot-wrap">
+        <img
+          src="https://raw.githubusercontent.com/leopers/coffio/main/data/cat.jpg"
+          alt="Coffio cat mascot"
+          loading="lazy"
+        />
+      </div>
+
+      <h3>☕ Coffio Café</h3>
+      <p class="subtitle">Start your day with a warm cup ~</p>
+
+      <button class="primary" type="button" data-action="brew">
+        ✨ Make Coffee Now
+      </button>
+
+      <div class="scheduler">
+        <label>
+          <span>⏰ Schedule Brew</span>
+          <input type="time" data-time value="07:30" />
+        </label>
+        <button class="secondary" type="button" data-action="schedule">
+          Set Time 💖
+        </button>
+      </div>
+
+      <button class="cancel" type="button" data-action="cancel">
+        Cancel Brew
+      </button>
+      <p class="status" aria-live="polite" data-status>
+        ~ Awaiting your command ~
+      </p>
+    </div>
+  </div>
+</figure>
+
+<script>
+  document
+    .querySelectorAll<HTMLElement>("[data-coffio-demo]")
+    .forEach((demo) => {
+      const status = demo.querySelector<HTMLElement>("[data-status]");
+      const time = demo.querySelector<HTMLInputElement>("[data-time]");
+
+      demo
+        .querySelector('[data-action="brew"]')
+        ?.addEventListener("click", () => {
+          if (status) status.textContent = "☕ Brewing... demo started.";
+        });
+
+      demo
+        .querySelector('[data-action="schedule"]')
+        ?.addEventListener("click", () => {
+          if (status)
+            status.textContent = time?.value
+              ? `🕐 Coffee scheduled for ${time.value}.`
+              : "📅 Choose a time first.";
+        });
+
+      demo
+        .querySelector('[data-action="cancel"]')
+        ?.addEventListener("click", () => {
+          if (status) status.textContent = "🛑 Brew canceled.";
+        });
+    });
+</script>
+
+<style>
+  .coffio-demo {
+    margin: 3rem 0;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    font-family: Arial, sans-serif;
+  }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    color: var(--muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  figcaption span:last-child {
+    text-align: right;
+  }
+  .browser-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.65rem 0.9rem;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper) 88%, var(--ink));
+  }
+  .browser-bar i {
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .browser-bar span {
+    margin-left: 0.55rem;
+    color: var(--muted);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.68rem;
+  }
+  .coffio-screen {
+    display: grid;
+    min-height: 620px;
+    padding: 5rem 1rem 2rem;
+    place-items: center;
+    background: linear-gradient(135deg, #ffe0e9, #fff5f8);
+  }
+  .coffio-card {
+    position: relative;
+    box-sizing: border-box;
+    width: min(90%, 360px);
+    padding: 3rem 1.5rem 1.5rem;
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: 0 0.625rem 1.5625rem rgb(0 0 0 / 10%);
+    color: #333;
+    text-align: center;
+  }
+  .mascot-wrap {
+    position: absolute;
+    top: -1.75rem;
+    left: 50%;
+    padding: 0.75rem;
+    transform: translateX(-50%);
+    border-radius: 1rem;
+    background: #fff5f8;
+    box-shadow: 0 0.3125rem 0.9375rem rgb(0 0 0 / 10%);
+  }
+  .mascot-wrap img {
+    display: block;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.9375rem;
+    object-fit: cover;
+  }
+  .coffio-card h3 {
+    margin: 0 0 0.5rem;
+    background: linear-gradient(90deg, #d27d9d, #ffb6c1);
+    background-clip: text;
+    color: transparent;
+    font-size: 1.75rem;
+  }
+  .subtitle {
+    margin: 0 0 1.875rem;
+    color: #666;
+    font-size: 0.875rem;
+  }
+  button {
+    display: block;
+    box-sizing: border-box;
+    width: 80%;
+    max-width: 280px;
+    margin: 0.5rem auto;
+    padding: 0.875rem 1.5rem;
+    border: 0;
+    border-radius: 0.75rem;
+    font: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+      transform 150ms ease,
+      filter 150ms ease;
+  }
+  button:hover {
+    filter: brightness(0.96);
+  }
+  button:active {
+    transform: scale(0.98);
+  }
+  button:focus-visible,
+  input:focus-visible {
+    outline: 3px solid #7b5d8e;
+    outline-offset: 2px;
+  }
+  .primary {
+    background: #ffb6c1;
+    color: #fff;
+  }
+  .secondary {
+    background: #dcd6f7;
+    color: #333;
+  }
+  .cancel {
+    background: #ff6b6b;
+    color: #fff;
+    font-weight: 700;
+  }
+  .scheduler {
+    margin-top: 1.25rem;
+  }
+  label > span {
+    display: block;
+    margin-bottom: 0.625rem;
+    color: #d27d9d;
+    font-size: 1rem;
+  }
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 0.625rem;
+    padding: 0.625rem;
+    border: 1px solid #ccc;
+    border-radius: 0.625rem;
+    background: #fff;
+    color: #333;
+    font: inherit;
+    font-size: 1rem;
+  }
+  .status {
+    min-height: 1.3em;
+    margin: 1.25rem 0 0;
+    color: #888;
+    font-size: 0.875rem;
+  }
+  @media (max-width: 560px) {
+    figcaption {
+      display: block;
+    }
+    figcaption span {
+      display: block;
+    }
+    figcaption span:last-child {
+      margin-top: 0.25rem;
+      text-align: left;
+    }
+    .coffio-screen {
+      min-height: 560px;
+      padding-inline: 0.35rem;
+    }
+  }
+</style>

@@ -325,6 +325,13 @@ h3 {
   font-size: 0.78rem;
   color: var(--muted);
 }
+.article-source {
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--violet);
+  font-size: 0.78rem;
+  text-underline-offset: 4px;
+}
 .translation-note {
   margin: -24px 0 44px;
   padding: 10px 14px;

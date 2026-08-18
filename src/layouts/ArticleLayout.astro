@@ -25,6 +25,18 @@ const date = data.published
         </div><h1>{data.title}</h1><div class="article-sub">
           {data.description}
         </div><div class="article-meta">{date} · {data.topics.join(" / ")}</div>
+        {
+          data.repo && (
+            <a
+              class="article-source"
+              href={data.repo}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t.sourceCode} ↗
+            </a>
+          )
+        }
       </header>{
         englishOnly && <p class="translation-note">{t.englishOnly}</p>
       }<div class="prose"><slot /></div>

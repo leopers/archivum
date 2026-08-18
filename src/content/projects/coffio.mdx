@@ -1,0 +1,166 @@
+---
+title: "Coffio"
+description: "A Wi-Fi controller that turns a conventional coffee maker into a programmable connected appliance."
+year: 2025
+topics: [Embedded Systems, Internet of Things, C++]
+status: complete
+featured: true
+repo: "https://github.com/leopers/coffio"
+---
+
+import CoffioPreview from "../../components/CoffioPreview.astro";
+
+Coffio adds a network interface to a conventional coffee maker with a mechanical switch. An ESP8266 controls the machine through a relay and serves a small phone-friendly web application, allowing a brew to be started immediately or scheduled for later.
+
+The device is self-contained: the firmware, HTTP server, scheduler, and frontend all run from the ESP8266. No cloud service or native application is involved.
+
+<CoffioPreview />
+
+## The control loop
+
+The entry point initializes the relay, joins the Wi-Fi network, mounts the LittleFS filesystem, and starts the two main subsystems.
+
+```cpp
+void setup() {
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED && retry < 30) {
+    delay(500);
+    retry++;
+  }
+
+  LittleFS.begin();
+  setupWebServer(RELAY_PIN);
+  setupScheduler(RELAY_PIN);
+}
+```
+
+Setting the relay output low before doing any networking is important: the coffee maker begins in a known off state even if connecting to Wi-Fi fails. Credentials live in a local `secrets.h` file excluded from version control.
+
+Once initialized, the board repeatedly services HTTP traffic, checks the schedule, and monitors the current brew. These tasks share one event loop rather than using separate threads. In the excerpt below, I have named the duration value to make the control logic easier to read.
+
+```cpp
+void loop() {
+  handleWebRequests();
+  checkAndTriggerSchedule(RELAY_PIN);
+
+  if (isBrewing && millis() - brewStartTime >= BREW_DURATION) {
+    digitalWrite(RELAY_PIN, LOW);
+    isBrewing = false;
+  }
+}
+```
+
+The state is represented by two values: `isBrewing` records whether the relay is active, while `brewStartTime` records when it was activated. Comparing `millis()` with the start time allows the program to stop a brew without calling a long `delay()`. The server therefore remains responsive while the machine is running.
+
+## Turning HTTP requests into physical actions
+
+The ESP8266 runs a web server on port 80. A request to `/on` closes the relay and records the beginning of the brew.
+
+```cpp
+server.on("/on", HTTP_GET, [relayPin]() {
+  if (!isBrewing) {
+    digitalWrite(relayPin, HIGH);
+    isBrewing = true;
+    brewStartTime = millis();
+    server.send(200, "text/plain", "Brewing");
+  } else {
+    server.send(400, "text/plain", "Already brewing");
+  }
+});
+```
+
+The guard prevents repeated button presses from restarting the timer or changing an already active state. The `/off` and `/cancel` routes perform the reverse operation by opening the relay and clearing the state.
+
+Scheduling uses another small route. The browser sends a time in `HH:MM` form, which the controller keeps in memory:
+
+```cpp
+server.on("/schedule", HTTP_GET, []() {
+  if (server.hasArg("time")) {
+    scheduledTime = server.arg("time");
+    server.send(200, "text/plain", "Scheduled");
+  } else {
+    server.send(400, "text/plain", "Missing time");
+  }
+});
+```
+
+This is intentionally a minimal local API. The current schedule is volatile, so restarting or disconnecting the board clears it. A more durable version could validate the input and store the schedule in flash memory.
+
+## Synchronizing and checking time
+
+The ESP8266 does not have a battery-backed real-time clock. Coffio obtains the current time from NTP servers after connecting to the network:
+
+```cpp
+void setupScheduler(int relayPin) {
+  configTime(-3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  while (time(nullptr) < 100000) {
+    delay(500);
+  }
+}
+```
+
+The offset in this first version is fixed to UTC−3, the time zone in which I originally used the device. Each pass through the loop converts the synchronized clock to `HH:MM` and compares it with the requested time.
+
+```cpp
+void checkAndTriggerSchedule(int relayPin) {
+  static String lastCheckedTime = "";
+  String now = getCurrentTime();
+
+  if (now != lastCheckedTime) {
+    lastCheckedTime = now;
+
+    if (scheduledTime.length() && now == scheduledTime) {
+      digitalWrite(relayPin, HIGH);
+      isBrewing = true;
+      brewStartTime = millis();
+      scheduledTime = "";
+    }
+  }
+}
+```
+
+`lastCheckedTime` makes the comparison run once per minute instead of on every processor cycle. Clearing `scheduledTime` after a match also makes the schedule one-shot: it cannot trigger again on the following loop iteration.
+
+## Hosting the interface on the microcontroller
+
+The frontend is stored in the ESP8266 flash filesystem and served directly by the device:
+
+```cpp
+server.serveStatic("/", LittleFS, "/index.html");
+server.serveStatic("/style.css", LittleFS, "/style.css");
+server.serveStatic("/script.js", LittleFS, "/script.js");
+server.serveStatic("/cat.jpg", LittleFS, "/cat.jpg");
+```
+
+This removes the need for an external backend. The HTML also provides a web-app manifest and iOS metadata, so the controller can be saved to a phone's home screen.
+
+The browser only needs to translate interface actions into requests to the board:
+
+```js
+document.getElementById("makeCoffeeBtn").onclick = () => {
+  fetch("/on")
+    .then(() => startCountdown(600))
+    .catch(() => updateStatus("Failed to start brew."));
+};
+
+document.getElementById("scheduleBtn").onclick = () => {
+  const time = document.getElementById("scheduleTime").value;
+  if (!time) return;
+
+  fetch(`/schedule?time=${encodeURIComponent(time)}`).then(() =>
+    updateStatus(`Coffee scheduled for ${time}.`),
+  );
+};
+```
+
+The countdown shown in the browser is a local representation of progress; the firmware remains the authority over the relay. This separation matters because closing the page should not interrupt a brew already underway.
+
+## What I learned
+
+Coffio was an exercise in treating an embedded system as a complete product rather than an isolated circuit. The main challenge was coordinating physical state, network requests, time synchronization, and a usable interface within the limits of a small microcontroller.
+
+The prototype also makes its next engineering steps clear: persistent schedules, configurable time zones, authentication for control routes, over-the-air updates, and status responses that let the browser read the device's actual state.
