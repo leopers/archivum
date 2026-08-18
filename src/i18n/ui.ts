@@ -142,10 +142,10 @@ export const ui = {
       music: "Música",
       about: "Sobre",
     },
-    footer: "Construído como um caderno vivo.",
+    footer: "Um caderno vivo.",
     personalArchive: "Arquivo pessoal",
     homeBio1:
-      "Sou o Leo, brasileiro e estudante de engenharia na École Polytechnique. Me interesso pelo encontro entre matemática aplicada e computação — de aprendizado de máquina e verificação formal à eletrônica.",
+      "Brasileiro e atualmente estudante de engenharia na École Polytechnique. Me interesso fortemente pela intercessão entre matemática aplicada e computação — do aprendizado de máquina à eletrônica.",
     homeBio2:
       "Uso este site para registrar o que estudo, construo e penso, com alguns desvios ocasionais pela música.",
     recentWriting: "Textos recentes",
@@ -175,20 +175,20 @@ export const ui = {
     musicWriting: "Textos sobre música",
     musicEmpty: "Meus textos sobre música aparecerão aqui.",
     about: "Sobre",
-    aboutTitle: "Sou o Leo.",
+    aboutTitle: "",
     aboutIntro:
       "Sou brasileiro e atualmente estudo engenharia na École Polytechnique, na França.",
     background: "Formação",
     background1:
-      "Antes de vir para a França, cursei Engenharia de Computação no ITA (Instituto Tecnológico de Aeronáutica). A formação me deu uma base forte em teoria da computação e projeto de hardware e despertou meu interesse pelas várias camadas entre ideias abstratas e as máquinas que as tornam concretas.",
+      "Antes de vir para a França, cursei Engenharia de Computação no ITA (Instituto Tecnológico de Aeronáutica). A formação me deu uma base forte em teoria da computação e projetos em hardware e despertou meu interesse pelas várias camadas entre ideias abstratas e as máquinas que as tornam concretas.",
     background2:
-      "Na École Polytechnique, exploro essa relação por outro ângulo, com foco em matemática aplicada e computação. Tenho interesse especial por aprendizado de máquina, inteligência artificial, verificação formal e eletrônica — principalmente por problemas que atravessam mais de uma dessas áreas.",
+      "Na École Polytechnique, estou explorando essa relação por outro ângulo, com um foco maior em matemática aplicada. Tenho interesse especial por aprendizado de máquina, inteligência artificial, verificação formal e eletrônica — principalmente por problemas que atravessam mais de uma dessas áreas.",
     thisArchive: "Este arquivo",
     archiveText:
       "Este site é onde desenvolvo ideias em público. Reúno notas de estudo, documento projetos e guardo pequenas intuições que seriam fáceis de perder depois do fim de um curso ou experimento.",
     outside: "Fora dos estudos",
     outsideText:
-      "A música é a outra constante da minha vida. Sou guitarrista amador e ouvinte curioso: passo do indie ao rock progressivo, do metal ao techno e ao trance conforme o momento.",
+      "A música é a outra constante da minha vida. Sou um guitarrista amador e passo a maior parte do meu tempo ouvindo do indie ao rock progressivo, do metal ao techno e ao trance conforme o momento.",
     elsewhere: "Outros lugares",
     researchNote: "Texto",
     underConstruction: "Em construção",
