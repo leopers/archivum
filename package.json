@@ -4,12 +4,13 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && node scripts/prepare-sites-build.mjs",
     "preview": "astro preview",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.2.1",
     "@astrojs/mdx": "latest",
     "@astrojs/sitemap": "latest",
     "astro": "latest",
@@ -22,5 +23,8 @@
     "prettier": "3.9.6",
     "prettier-plugin-astro": "0.14.1",
     "typescript": "latest"
+  },
+  "optionalDependencies": {
+    "@cloudflare/workerd-darwin-arm64": "^1.20260818.1"
   }
 }
