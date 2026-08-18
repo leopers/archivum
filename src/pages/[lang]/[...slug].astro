@@ -5,20 +5,27 @@ import type { Locale } from "../../i18n/ui";
 
 export async function getStaticPaths() {
   const writing = await getCollection("writing", ({ data }) => !data.draft);
+  const writingPt = await getCollection("writingPt", ({ data }) => !data.draft);
   const projects = await getCollection("projects");
   const music = await getCollection("music", ({ data }) => !data.draft);
   const pages = [undefined, "writing", "projects", "topics", "music", "about"];
   const details = [
     ...writing.map((entry) => `writing/${entry.id}`),
+    ...writingPt.map((entry) => `writing/${entry.id}`),
     ...projects.map((entry) => `projects/${entry.id}`),
     ...music.map((entry) => `music/${entry.id}`),
   ];
-  return (["fr"] as const).flatMap((lang) =>
+  return (["fr", "pt-br"] as const).flatMap((lang) =>
     [...pages, ...details].map((slug) => ({ params: { lang, slug } })),
   );
 }
 
-const locale: Locale = Astro.params.lang === "fr" ? "fr" : "en";
+const locale: Locale =
+  Astro.params.lang === "fr"
+    ? "fr"
+    : Astro.params.lang === "pt-br"
+      ? "pt-br"
+      : "en";
 const slug = Astro.params.slug || "";
 ---
 

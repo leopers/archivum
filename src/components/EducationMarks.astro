@@ -1,10 +1,10 @@
 ---
 interface Props {
-  locale?: "en" | "fr";
+  locale?: "en" | "fr" | "pt-br";
 }
 
 const { locale = "en" } = Astro.props;
-const label = locale === "fr" ? "Formation" : "Education";
+const label = locale === "fr" ? "Formation" : locale === "pt-br" ? "Formação" : "Education";
 ---
 
 <aside class="education-marks" aria-label={label}>

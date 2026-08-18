@@ -16,7 +16,7 @@ const {
 const locale = (localeProp || Astro.currentLocale || "en") as Locale;
 const t = ui[locale];
 const path = Astro.url.pathname;
-const unprefixedPath = path.replace(/^\/fr(?=\/|$)/, "") || "/";
+const unprefixedPath = path.replace(/^\/(?:fr|pt-br)(?=\/|$)/, "") || "/";
 const links = [
   ["writing", t.nav.writing],
   ["projects", t.nav.projects],
@@ -111,15 +111,20 @@ const links = [
       });
     </script><script is:inline define:vars={{ detectLanguage }}>
       const savedLocale = localStorage.getItem("locale");
-      if (savedLocale && !["en", "fr"].includes(savedLocale)) {
+      if (savedLocale && !["en", "fr", "pt-br"].includes(savedLocale)) {
         localStorage.removeItem("locale");
       }
 
       if (detectLanguage && !localStorage.getItem("locale")) {
-        const preferred = (navigator.languages || [navigator.language]).find(
-          (language) => language?.toLowerCase().startsWith("fr"),
+        const languages = navigator.languages || [navigator.language];
+        const preferred = languages.find((language) =>
+          /^(fr|pt(?:-|$))/i.test(language || ""),
         );
-        const target = preferred ? "/fr/" : null;
+        const target = preferred?.toLowerCase().startsWith("fr")
+          ? "/fr/"
+          : preferred
+            ? "/pt-br/"
+            : null;
         if (target) location.replace(target);
       }
     </script></body
