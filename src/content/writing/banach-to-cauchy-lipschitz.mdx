@@ -607,3 +607,157 @@ $$
 By the equivalence between the differential and integral formulations established earlier, this fixed point belongs to $C^1(J;\mathbb{R}^n)$ and is a solution of the Cauchy problem. The uniqueness of Banach’s fixed point gives uniqueness among the solutions whose graphs remain in $A$ on $J$.
 
 The proof is now complete: the bounds on $f$ determine a time interval on which $\Phi$ is well defined and contracting, while the completeness of $E$ ensures that the method of successive approximations converges to the solution.
+
+## The Cauchy–Lipschitz theorem for a $C^1$ vector field
+
+The preceding theorem is precise, but its hypotheses involve constants $M$ and $C$ that must be verified on a neighborhood of the initial condition. In most applications, a simpler regularity assumption is sufficient.
+
+**Corollary.** Let $I\subseteq\mathbb{R}$ and $U\subseteq\mathbb{R}^n$ be open, and let
+
+$$
+f:I\times U\longrightarrow\mathbb{R}^n
+$$
+
+be of class $C^1$. For every $(t_0,x_0)\in I\times U$, there exist $T>0$ and a solution
+
+$$
+x:[t_0-T,t_0+T]\longrightarrow U
+$$
+
+of
+
+$$
+x'(t)=f(t,x(t)),
+\qquad
+x(t_0)=x_0.
+$$
+
+Moreover, this solution is locally unique: if $\widetilde J\subseteq[t_0-T,t_0+T]$ is an interval containing $t_0$ and $\widetilde x:\widetilde J\to U$ is another solution with $\widetilde x(t_0)=x_0$, then
+
+$$
+\widetilde x(t)=x(t)
+\qquad
+\text{for every }t\in\widetilde J.
+$$
+
+### Proof of existence
+
+Since $I\times U$ is open and $(t_0,x_0)\in I\times U$, there exists $\delta>0$ such that
+
+$$
+A=
+\left\{
+(t,x)\in\mathbb{R}\times\mathbb{R}^n:
+|t-t_0|\leq\delta,
+\ \lVert x-x_0\rVert\leq\delta
+\right\}
+$$
+
+is contained in $I\times U$. The set $A$ is compact.
+
+Because $f$ is continuous, it is bounded on $A$. Thus there exists $M>0$ such that
+
+$$
+\lVert f(t,x)\rVert\leq M
+\qquad
+\text{for every }(t,x)\in A.
+$$
+
+It remains to obtain a Lipschitz constant with respect to the second variable. Let
+
+$$
+D_xf(t,x)
+$$
+
+denote the Jacobian matrix of $f$ with respect to $x$. Since $f$ is of class $C^1$, the map $(t,x)\mapsto D_xf(t,x)$ is continuous. It is therefore bounded on the compact set $A$: there exists $C>0$ such that
+
+$$
+\lVert D_xf(t,x)\rVert_{\mathrm{op}}
+\leq C
+\qquad
+\text{for every }(t,x)\in A.
+$$
+
+For a fixed $t$, the closed ball $\overline B(x_0,\delta)$ is convex. Hence, for all $(t,x),(t,y)\in A$, the mean value inequality gives
+
+$$
+\lVert f(t,x)-f(t,y)\rVert
+\leq
+\left(
+\sup_{z\in\overline B(x_0,\delta)}
+\lVert D_xf(t,z)\rVert_{\mathrm{op}}
+\right)
+\lVert x-y\rVert
+\leq
+C\lVert x-y\rVert.
+$$
+
+The hypotheses of the precise local theorem are therefore satisfied. With
+
+$$
+T=
+\min\left\{
+\delta,
+\frac{\delta}{2M},
+\frac{1}{2C}
+\right\},
+$$
+
+that theorem gives a solution on $[t_0-T,t_0+T]$.
+
+### Why the uniqueness statement is stronger
+
+The fixed-point argument initially proves uniqueness only among functions in
+
+$$
+E=C\bigl([t_0-T,t_0+T];\overline B(x_0,\delta)\bigr).
+$$
+
+The corollary claims more: any other solution defined on a smaller interval containing $t_0$ must coincide with $x$, without assuming beforehand that all its values remain in the closed ball. This follows from continuity and a continuation argument.
+
+We prove the assertion to the right of $t_0$; the proof to the left is identical. It is enough to fix an arbitrary closed interval
+
+$$
+[a,b]\subseteq\widetilde J
+$$
+
+with $a\leq t_0\leq b$, and define
+
+$$
+\gamma=
+\sup\left\{
+t\in[t_0,b]:
+\widetilde x(s)\in\overline B(x_0,\delta)
+\text{ for every }s\in[t_0,t]
+\right\}.
+$$
+
+Since $\widetilde x(t_0)=x_0$ and $\widetilde x$ is continuous, $\gamma$ is well defined and $\gamma>t_0$. On $[t_0,\gamma]$, both $x$ and $\widetilde x$ satisfy the same integral equation and take their values in $\overline B(x_0,\delta)$. The fixed-point uniqueness argument, applied on this shorter interval, gives
+
+$$
+\widetilde x(t)=x(t)
+\qquad
+\text{for every }t\in[t_0,\gamma].
+$$
+
+The construction of $x$ gives the sharper bound
+
+$$
+\lVert x(t)-x_0\rVert
+\leq
+\frac{\delta}{2}
+\qquad
+\text{for every }t\in[t_0-T,t_0+T].
+$$
+
+Consequently,
+
+$$
+\lVert\widetilde x(\gamma)-x_0\rVert
+\leq
+\frac{\delta}{2}.
+$$
+
+If $\gamma<b$, continuity of $\widetilde x$ would imply that $\widetilde x(t)$ remains in $\overline B(x_0,\delta)$ for times slightly larger than $\gamma$, contradicting the definition of $\gamma$. Hence $\gamma=b$, and the two solutions coincide on $[t_0,b]$. The same argument shows that they coincide on $[a,t_0]$. Since $[a,b]\subseteq\widetilde J$ was arbitrary, they coincide on all of $\widetilde J$.
+
+This is the usual local form of the Cauchy–Lipschitz theorem: a $C^1$ vector field determines one and only one solution through every initial condition, at least on a sufficiently small interval around the initial time.
