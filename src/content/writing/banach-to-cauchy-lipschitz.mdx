@@ -1,0 +1,20 @@
+---
+title: "Demystifying existence and uniqueness for ODEs through a fixed-point perspective"
+description: "How Banach's fixed-point theorem reveals the structure behind Picard iteration and the Cauchy–Lipschitz theorem."
+published: 2026-08-18
+topics: [Ordinary Differential Equations, Analysis, Fixed-Point Theory]
+draft: false
+featured: true
+---
+
+## Motivation
+
+In most undergraduate ODE courses taught in Brazil, existence and uniqueness are presented as facts to be accepted rather than results to be understood. After learning how to solve a few familiar classes of equations, students are introduced to Picard iteration and told that, under suitable assumptions, it converges to a unique solution. The argument is often compressed into a sequence of estimates, leaving the central question unanswered: why should this procedure establish both existence and uniqueness?
+
+This was how I first encountered the subject. The Cauchy–Lipschitz theorem seemed to depend on a clever but rather obscure construction specific to differential equations. Picard’s method produced successive approximations, but the deeper reason for their convergence—and for the uniqueness of their limit—remained hidden behind the calculations.
+
+While studying differential equations in France, I encountered a different presentation. Instead of beginning with Picard iteration, it begins with a general result from analysis: Banach’s fixed-point theorem. An initial-value problem is rewritten as an integral equation, and this equation defines an operator on a suitable space of functions. A solution of the ODE is then precisely a fixed point of this operator.
+
+From this perspective, Picard iteration is no longer an isolated trick. It is simply the repeated application of a contraction, and its convergence follows from the completeness of the underlying function space. Existence and uniqueness are not separate miracles: both are consequences of the same fixed-point principle.
+
+The purpose of this article is to develop this connection carefully. We will first establish Banach’s fixed-point theorem and understand the role played by completeness and contraction. We will then construct the Picard operator associated with an initial-value problem and show how the local Cauchy–Lipschitz theorem follows from it. The goal is to replace an opaque procedure with a clear structural argument—and to make explicit the reasoning that is too often left between the lines.
