@@ -24,7 +24,12 @@ const date = data.published
           >{data.title}</h1
         ><div class="article-sub">
           {data.description}
-        </div><div class="article-meta">{date} · {data.topics.join(" / ")}</div>
+        </div><div class="article-meta">
+          <span>{date} · {data.topics.join(" / ")}</span>
+          {data.status === "under-construction" && (
+            <span class="construction-label">{t.underConstruction}</span>
+          )}
+        </div>
         {
           data.repo && (
             <a

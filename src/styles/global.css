@@ -267,9 +267,25 @@ h3 {
   border-top: 0;
 }
 .entry-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
   font-size: 0.77rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+.construction-label {
+  display: inline-block;
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--line));
+  color: var(--accent);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.61rem;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .entry h3 {
   font-size: 1.45rem;
@@ -417,6 +433,10 @@ h3 {
   color: var(--muted);
 }
 .article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
   margin-top: 24px;
   font-size: 0.78rem;
   color: var(--muted);
