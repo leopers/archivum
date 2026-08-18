@@ -256,3 +256,149 @@ $$
 Therefore $y_n\to y$ uniformly on $J$. Since a uniform limit of continuous functions is continuous, $y\in C(J;\mathbb{R}^n)$. This proves that the space is complete.
 
 This is the space in which we will apply the method of successive approximations to the Picard map $\Phi$. The next step is to define a contraction and prove Banach’s fixed-point theorem.
+
+## Contractions and Banach’s fixed-point theorem
+
+### Contracting maps
+
+Let $(X,d)$ be a metric space. A map
+
+$$
+f:X\longrightarrow X
+$$
+
+is said to be **contracting** if there exists $k\in[0,1)$ such that, for all $x,y\in X$,
+
+$$
+d\bigl(f(x),f(y)\bigr)
+\leq
+k\,d(x,y).
+$$
+
+Equivalently, $f$ is Lipschitz continuous with a Lipschitz constant $k<1$. The essential point is the strict inequality: applying $f$ reduces distances by at least a fixed factor.
+
+In particular, every contracting map is continuous. Indeed, if $x_n\to x$, then
+
+$$
+d\bigl(f(x_n),f(x)\bigr)
+\leq
+k\,d(x_n,x)
+\longrightarrow 0.
+$$
+
+A point $x\in X$ is called a **fixed point** of $f$ if
+
+$$
+f(x)=x.
+$$
+
+We can now state the result that will provide both existence and uniqueness for the differential equation.
+
+### Banach’s fixed-point theorem
+
+**Theorem.** Let $(X,d)$ be a nonempty complete metric space and let $f:X\to X$ be a contracting map. Then $f$ has a unique fixed point in $X$.
+
+The proof is constructive: starting from an arbitrary point, it defines a sequence that converges to the fixed point.
+
+### Proof: existence by successive approximations
+
+Choose any $x_0\in X$ and define the sequence $(x_n)_{n\geq 0}$ by
+
+$$
+x_{n+1}=f(x_n),
+\qquad n\geq 0.
+$$
+
+Equivalently, $x_n=f^n(x_0)$. We first prove that $(x_n)_{n\geq 0}$ is a Cauchy sequence.
+
+For every $n\geq 0$, successive applications of the contraction property give
+
+$$
+d(x_{n+1},x_n)
+\leq
+k^n d(x_1,x_0).
+$$
+
+For $n\geq 1$, this follows from
+
+$$
+d(x_{n+1},x_n)
+\leq
+k,d(x_n,x_{n-1})
+\leq
+\cdots
+\leq
+k^n d(x_1,x_0).
+$$
+
+Let $m>n$. By the triangle inequality,
+
+$$
+\begin{aligned}
+d(x_m,x_n)
+&\leq
+\sum_{j=n}^{m-1}d(x_{j+1},x_j)\\
+&\leq
+\sum_{j=n}^{m-1}k^j d(x_1,x_0)\\
+&\leq
+\frac{k^n}{1-k}d(x_1,x_0).
+\end{aligned}
+$$
+
+Since $k\in[0,1)$,
+
+$$
+\frac{k^n}{1-k}d(x_1,x_0)
+\longrightarrow 0
+\qquad\text{as }n\longrightarrow+\infty.
+$$
+
+Therefore $(x_n)_{n\geq 0}$ is a Cauchy sequence. Since $X$ is complete, there exists $x_\infty\in X$ such that
+
+$$
+x_n\longrightarrow x_\infty.
+$$
+
+The map $f$ is continuous, and hence
+
+$$
+f(x_\infty)
+=
+f\left(\lim_{n\to+\infty}x_n\right)
+=
+\lim_{n\to+\infty}f(x_n)
+=
+\lim_{n\to+\infty}x_{n+1}
+=
+x_\infty.
+$$
+
+Thus $x_\infty$ is a fixed point of $f$.
+
+### Error bound
+
+The preceding proof also controls the error after a finite number of successive approximations. Letting $m\to+\infty$ in the inequality above gives
+
+$$
+d(x_\infty,x_n)
+\leq
+\frac{k^n}{1-k}d(x_1,x_0).
+$$
+
+Consequently, the fixed point can be approximated with arbitrary precision, and the required number of steps can be estimated before performing them.
+
+### Proof of uniqueness
+
+Suppose that $x,y\in X$ are fixed points of $f$. Then
+
+$$
+d(x,y)
+=
+d\bigl(f(x),f(y)\bigr)
+\leq
+k\,d(x,y).
+$$
+
+Since $k<1$, this is possible only if $d(x,y)=0$. By the separation property of the distance, $x=y$. The fixed point is therefore unique.
+
+Banach’s theorem has now isolated the entire mechanism: the contraction makes the successive approximations a Cauchy sequence, completeness supplies their limit, continuity makes that limit a fixed point, and the same contraction inequality gives uniqueness. It remains to verify these hypotheses for the Picard map associated with the Cauchy problem.
