@@ -8,7 +8,9 @@ import EducationMarks from "./EducationMarks.astro";
 import AboutField from "./AboutField.astro";
 import { localePath, ui, type Locale } from "../i18n/ui";
 
-const { locale, slug = "" } = Astro.props as { locale: Locale; slug?: string };
+const requestedLocale = Astro.props.locale;
+const locale: Locale = requestedLocale === "fr" ? "fr" : "en";
+const { slug = "" } = Astro.props as { slug?: string };
 const t = ui[locale];
 const writing = (
   await getCollection("writing", ({ data }) => !data.draft)
