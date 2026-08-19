@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export const prerender = true;
+---
+
+<BaseLayout title="Comment moderation — Leonardo Dias">
+  <main class="moderation-page">
+    <header class="page-head moderation-head">
+      <div class="eyebrow">Private</div>
+      <h1>Comment moderation</h1>
+      <p>Review suggestions before they appear on the site.</p>
+    </header>
+
+    <form class="moderation-login" data-moderation-login>
+      <label>
+        <span>Moderator key</span>
+        <input
+          type="password"
+          name="token"
+          autocomplete="current-password"
+          required
+        />
+      </label>
+      <button type="submit">Open moderation</button>
+    </form>
+    <p class="comment-status" data-moderation-status role="status"></p>
+    <div class="moderation-list" data-moderation-list hidden></div>
+  </main>
+</BaseLayout>
+
+<script is:inline>
+  const form = document.querySelector("[data-moderation-login]");
+  const status = document.querySelector("[data-moderation-status]");
+  const list = document.querySelector("[data-moderation-list]");
+  let token = "";
+
+  const escapeHtml = (value) => {
+    const element = document.createElement("span");
+    element.textContent = value;
+    return element.innerHTML;
+  };
+
+  const loadPending = async () => {
+    status.textContent = "Loading comments…";
+    const response = await fetch("/api/comments?moderation=pending", {
+      headers: { "x-admin-token": token },
+    });
+    if (!response.ok) {
+      status.textContent = "The moderator key is not valid.";
+      return;
+    }
+    const { comments } = await response.json();
+    form.hidden = true;
+    list.hidden = false;
+    status.textContent = comments.length
+      ? `${comments.length} comment${comments.length === 1 ? "" : "s"} awaiting review.`
+      : "No comments are awaiting review.";
+    list.innerHTML = comments
+      .map(
+        (
+          comment,
+        ) => `<article class="moderation-card" data-comment-id="${comment.id}">
+          <header><strong>${escapeHtml(comment.author_name)}</strong><span>${escapeHtml(comment.locale)} · ${escapeHtml(comment.content_key)}</span></header>
+          <p>${escapeHtml(comment.body).replaceAll("\n", "<br>")}</p>
+          <footer><button data-action="approved">Approve</button><button class="secondary" data-action="rejected">Reject</button></footer>
+        </article>`,
+      )
+      .join("");
+  };
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    token = new FormData(form).get("token")?.toString() || "";
+    loadPending();
+  });
+
+  list.addEventListener("click", async (event) => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    const card = button.closest("[data-comment-id]");
+    button.disabled = true;
+    const response = await fetch("/api/comments", {
+      method: "PATCH",
+      headers: { "content-type": "application/json", "x-admin-token": token },
+      body: JSON.stringify({
+        id: card.dataset.commentId,
+        status: button.dataset.action,
+      }),
+    });
+    if (response.ok) card.remove();
+    else button.disabled = false;
+  });
+</script>
