@@ -124,11 +124,13 @@ export const prerender = true;
       return;
     button.disabled = true;
     const response = await fetch("/api/comments", {
-      method: deleting ? "DELETE" : "PATCH",
+      method: "PATCH",
       headers: { "content-type": "application/json", "x-admin-token": token },
       body: JSON.stringify({
         id: card.dataset.commentId,
-        ...(deleting ? {} : { status: button.dataset.action }),
+        ...(deleting
+          ? { action: "delete" }
+          : { status: button.dataset.action }),
       }),
     });
     if (response.ok) {

@@ -133,7 +133,15 @@ export const PATCH: APIRoute = async ({ request }) => {
       return json({ error: "Unauthorized." }, 401);
     const payload = (await request.json()) as Record<string, unknown>;
     const id = String(payload.id ?? "");
+    const action = String(payload.action ?? "");
     const status = String(payload.status ?? "");
+    if (action === "delete") {
+      if (!id) return json({ error: "A comment id is required." }, 400);
+      const db = getCommentsDb();
+      await ensureCommentsSchema(db);
+      await db.prepare("DELETE FROM comments WHERE id = ?").bind(id).run();
+      return json({ ok: true });
+    }
     if (!id || !["approved", "rejected"].includes(status))
       return json({ error: "Invalid moderation action." }, 400);
     const db = getCommentsDb();
@@ -149,23 +157,5 @@ export const PATCH: APIRoute = async ({ request }) => {
   } catch (error) {
     console.error("comments:patch", error);
     return json({ error: "The moderation action failed." }, 500);
-  }
-};
-
-export const DELETE: APIRoute = async ({ request }) => {
-  try {
-    if (!isAdminToken(request.headers.get("x-admin-token")))
-      return json({ error: "Unauthorized." }, 401);
-    const payload = (await request.json()) as Record<string, unknown>;
-    const id = String(payload.id ?? "").trim();
-    if (!id) return json({ error: "A comment id is required." }, 400);
-
-    const db = getCommentsDb();
-    await ensureCommentsSchema(db);
-    await db.prepare("DELETE FROM comments WHERE id = ?").bind(id).run();
-    return json({ ok: true });
-  } catch (error) {
-    console.error("comments:delete", error);
-    return json({ error: "The comment could not be deleted." }, 500);
   }
 };
