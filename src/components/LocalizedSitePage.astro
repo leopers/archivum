@@ -8,11 +8,22 @@ import EducationMarks from "./EducationMarks.astro";
 import AboutField from "./AboutField.astro";
 import { localePath, ui, type Locale } from "../i18n/ui";
 
-const { locale, slug = "" } = Astro.props as { locale: Locale; slug?: string };
+const requestedLocale = Astro.props.locale;
+const locale: Locale =
+  requestedLocale === "fr"
+    ? "fr"
+    : requestedLocale === "pt-br"
+      ? "pt-br"
+      : "en";
+const { slug = "" } = Astro.props as { slug?: string };
 const t = ui[locale];
-const writing = (
+const writingEn = (
   await getCollection("writing", ({ data }) => !data.draft)
 ).sort((a, b) => +b.data.published - +a.data.published);
+const writingPt = (
+  await getCollection("writingPt", ({ data }) => !data.draft)
+).sort((a, b) => +b.data.published - +a.data.published);
+const writing = locale === "pt-br" ? writingPt : writingEn;
 const projects = await getCollection("projects");
 const translatedProjects = await getCollection("projectsFr");
 const displayedProjects = locale === "fr" ? translatedProjects : projects;
@@ -52,6 +63,7 @@ const topicDescriptions: Record<Locale, Record<string, string>> = {
     "C++": "Programmation système et embarquée.",
     PyTorch: "Expériences et implémentations de réseaux neuronaux.",
   },
+  "pt-br": {},
 };
 
 let articleEntry: any;
@@ -93,7 +105,11 @@ const topicEntryType = (entry: (typeof allForTopics)[number]) =>
     <ArticleLayout
       data={articleEntry.data}
       locale={locale}
-      englishOnly={articleEntry.collection !== "projectsFr"}
+      englishOnly={
+        locale !== "en" &&
+        articleEntry.collection !== "projectsFr" &&
+        articleEntry.collection !== "writingPt"
+      }
     >
       <Content />
     </ArticleLayout>
@@ -171,7 +187,13 @@ const topicEntryType = (entry: (typeof allForTopics)[number]) =>
           {writing.length > 0 ? (
             <EntryList entries={writing} locale={locale} />
           ) : (
-            <p class="empty-note">Aucun texte publié pour le moment.</p>
+            <p class="empty-note">
+              {locale === "fr"
+                ? "Aucun texte publié pour le moment."
+                : locale === "pt-br"
+                  ? "Nenhum texto publicado por enquanto."
+                  : "No writing published yet."}
+            </p>
           )}
         </section>
       </>
@@ -221,7 +243,14 @@ const topicEntryType = (entry: (typeof allForTopics)[number]) =>
               id={topic.toLowerCase().replaceAll(" ", "-")}
             >
               <h2>{topic}</h2>
-              <p>{topicDescriptions[locale][topic] || "Notes et projets."}</p>
+              <p>
+                {topicDescriptions[locale][topic] ||
+                  (locale === "fr"
+                    ? "Notes et projets."
+                    : locale === "pt-br"
+                      ? "Textos e projetos."
+                      : "Notes and projects.")}
+              </p>
               <span class="tag">
                 {entries.length} {entries.length === 1 ? t.entry : t.entries}
               </span>

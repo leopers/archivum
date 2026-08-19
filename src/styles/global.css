@@ -267,9 +267,25 @@ h3 {
   border-top: 0;
 }
 .entry-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
   font-size: 0.77rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+.construction-label {
+  display: inline-block;
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--line));
+  color: var(--accent);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.61rem;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .entry h3 {
   font-size: 1.45rem;
@@ -406,6 +422,14 @@ h3 {
 }
 .article-head {
   margin-bottom: 55px;
+  padding-top: 24px;
+  border-top: 2px solid;
+  border-image: linear-gradient(
+      90deg,
+      var(--accent) 0 76%,
+      var(--violet) 76% 100%
+    )
+    1;
 }
 .article-head h1 {
   font-size: clamp(2.8rem, 6vw, 5rem);
@@ -417,9 +441,22 @@ h3 {
   color: var(--muted);
 }
 .article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
   margin-top: 24px;
   font-size: 0.78rem;
   color: var(--muted);
+}
+.article-meta::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 11px 0 0 color-mix(in srgb, var(--violet) 72%, transparent);
+  margin-right: 10px;
 }
 .article-source {
   display: inline-block;
@@ -443,15 +480,40 @@ h3 {
   line-height: 1.82;
 }
 .prose h2 {
+  position: relative;
   font-size: 2rem;
   margin: 2.4em 0 0.7em;
+  padding-top: 0.55em;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 38%, var(--line));
+}
+.prose h2::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 4.2rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent) 0 72%, var(--violet) 72%);
 }
 .prose h3 {
   font-size: 1.45rem;
   margin: 2em 0 0.65em;
+  color: var(--violet);
 }
 .prose p {
   margin: 1.15em 0;
+}
+.prose a {
+  color: var(--violet);
+  text-decoration-color: color-mix(in srgb, var(--violet) 45%, transparent);
+}
+.prose a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+.prose strong {
+  color: var(--accent);
+  font-weight: 600;
 }
 .prose blockquote {
   margin: 2em 0;
@@ -478,7 +540,9 @@ h3 {
   overflow-x: auto;
   overflow-y: hidden;
   margin: 1.45rem 0;
-  padding: 0.35rem 0 0.45rem;
+  padding: 0.55rem 1rem 0.65rem;
+  border-left: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent-soft) 34%, transparent);
   font-size: 0.86em;
   line-height: 1.35;
   text-align: center;
@@ -544,7 +608,8 @@ h3 {
   position: sticky;
   top: 40px;
   align-self: start;
-  border-top: 1px solid var(--line);
+  border-top: 2px solid;
+  border-image: linear-gradient(90deg, var(--accent) 0 72%, var(--violet) 72%) 1;
   padding-top: 18px;
   color: var(--muted);
   font-size: 0.76rem;
@@ -553,6 +618,9 @@ h3 {
   display: block;
   margin: 8px 0;
   text-decoration: none;
+}
+.aside a:hover {
+  color: var(--violet);
 }
 .about-grid {
   display: grid;

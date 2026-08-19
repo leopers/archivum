@@ -1,0 +1,578 @@
+---
+title: "De pontos fixos a soluções de EDOs: a ideia de Banach"
+description: "Como o teorema do ponto fixo de Banach esclarece o método das aproximações sucessivas de Picard e o teorema de Cauchy–Lipschitz."
+published: 2026-08-18
+topics: [Equações Diferenciais Ordinárias, Análise, Teorema do Ponto Fixo]
+draft: false
+status: complete
+featured: true
+---
+
+## Motivação
+
+Na maioria dos cursos de Equações Diferenciais Ordinárias no Brasil, a existência e unicidade das soluções aparecem como um fato a ser aceito pelo aluno. Depois de aprender a resolver algumas famílias conhecidas de equações, o aluno encontra o método de Picard: define-se uma sequência de funções, iteram-se algumas estimativas e afirma-se que a sequência converge para uma única solução.
+
+Foi assim que eu primeiro aprendi o teorema de Cauchy–Lipschitz. O método funcionava, mas sua lógica permanecia escondida nos cálculos. Por que as aproximações deveriam convergir? Por que o limite seria uma solução? E, sobretudo, por que o mesmo procedimento também provaria a unicidade?
+
+Quando eu novamente estudei equações diferenciais na França, encontrei uma nova abordagem para essa teoria. Antes de Picard, demonstra-se um resultado geral de análise: o teorema do ponto fixo de Banach. Em seguida, o problema de valor inicial é transformado numa equação integral, que por sua vez define uma aplicação sobre um espaço de funções. Resolver a EDO passa a significar encontrar um ponto fixo dessa aplicação.
+
+Desse ponto de vista, o método de Picard deixa de ser uma construção particular das equações diferenciais. Ele é simplesmente o método das aproximações sucessivas aplicado a uma contração. É essa ligação que quero tornar explícita neste texto, partindo das noções de espaço métrico e completude até chegar ao teorema local de Cauchy–Lipschitz.
+
+## O problema de valor inicial
+
+Sejam $I\subseteq\mathbb{R}$ um intervalo, $U\subseteq\mathbb{R}^n$ um aberto e
+
+$$
+f:I\times U\longrightarrow\mathbb{R}^n.
+$$
+
+Fixados um instante $t_0\in I$ e um estado $x_0\in U$, consideramos o problema
+
+$$
+\begin{cases}
+\dot{x}(t)=f(t,x(t)),\\
+x(t_0)=x_0.
+\end{cases}
+$$
+
+Esse é um **problema de valor inicial**, também chamado de **problema de Cauchy**. Se $J\subseteq I$ é um intervalo que contém $t_0$, dizemos que
+
+$$
+x:J\longrightarrow U
+$$
+
+é uma solução em $J$ quando $x\in C^1(J,U)$ e
+
+$$
+x(t_0)=x_0,
+\qquad
+\dot{x}(t)=f(t,x(t))
+\quad\text{para todo }t\in J.
+$$
+
+O próprio intervalo $J$ faz parte da solução. Antes de procurar uma fórmula explícita para $x$, há duas perguntas mais fundamentais.
+
+**Existência.** Há algum intervalo em torno de $t_0$ no qual uma solução esteja definida?
+
+**Unicidade.** Se duas soluções passam pelo mesmo ponto $(t_0,x_0)$, elas necessariamente coincidem perto de $t_0$?
+
+O teorema de Cauchy–Lipschitz responde afirmativamente às duas perguntas sob hipóteses adequadas sobre $f$. A resposta é local: ela vale, a princípio, apenas em algum intervalo ao redor do instante inicial.
+
+### Da equação diferencial à equação integral
+
+O primeiro passo é elementar, mas muda completamente a forma de olhar para o problema.
+
+**Lema.** Suponha que $f$ seja contínua. Uma função contínua $x:J\to U$ resolve o problema de Cauchy se, e somente se,
+
+$$
+x(t)=x_0+\int_{t_0}^{t}f(s,x(s))\,ds
+\qquad\text{para todo }t\in J.
+$$
+
+**Demonstração.** Se $x$ é solução, o teorema fundamental do cálculo fornece
+
+$$
+x(t)-x(t_0)
+=
+\int_{t_0}^{t}\dot{x}(s)\,ds
+=
+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+Usando $x(t_0)=x_0$, obtemos a fórmula integral. Reciprocamente, se a fórmula vale, a continuidade de $f$ permite derivá-la. Assim,
+
+$$
+\dot{x}(t)=f(t,x(t)),
+$$
+
+e, tomando $t=t_0$, recuperamos a condição inicial.
+
+A vantagem dessa formulação é que a incógnita deixa de aparecer sob uma derivada. Podemos agora definir uma aplicação que recebe uma curva $y$ e devolve outra curva:
+
+$$
+\Phi(y)(t)
+=
+x_0+\int_{t_0}^{t}f(s,y(s))\,ds.
+$$
+
+Resolver o problema de Cauchy equivale, portanto, a encontrar uma função $x$ tal que
+
+$$
+\Phi(x)=x.
+$$
+
+Em outras palavras, procuramos um ponto fixo de $\Phi$. Falta-nos, então, escolher um espaço de funções no qual essa aplicação esteja bem definida e seja contrativa.
+
+## Espaços métricos e completude
+
+Como $\Phi$ atua sobre funções, precisamos medir a distância entre duas funções. Também precisamos garantir que, quando as aproximações se tornam arbitrariamente próximas, seu limite continue pertencendo ao espaço considerado. É exatamente isso que as noções de distância e completude formalizam.
+
+### Distâncias e espaços métricos
+
+**Definição.** Seja $X$ um conjunto. Uma aplicação
+
+$$
+d:X\times X\longrightarrow[0,+\infty)
+$$
+
+é uma **distância** sobre $X$ se, para todos $x,y,z\in X$,
+
+$$
+\begin{aligned}
+d(x,y)=0 &\quad\Longleftrightarrow\quad x=y &&\text{(separação)},\\
+d(x,y)&=d(y,x) &&\text{(simetria)},\\
+d(x,z)&\leq d(x,y)+d(y,z) &&\text{(desigualdade triangular)}.
+\end{aligned}
+$$
+
+O par $(X,d)$ é chamado de **espaço métrico**.
+
+Uma sequência $(x_n)_{n\geq0}$ converge para $x\in X$ quando
+
+$$
+d(x_n,x)\longrightarrow0.
+$$
+
+Já uma **sequência de Cauchy** é uma sequência cujos termos se aproximam entre si:
+
+$$
+\forall\varepsilon>0,\quad
+\exists n_0\in\mathbb N,\quad
+\forall n,m\geq n_0,\quad
+d(x_n,x_m)<\varepsilon.
+$$
+
+Toda sequência convergente é de Cauchy. De fato, se $x_n\to x$, então, para $n$ e $m$ suficientemente grandes,
+
+$$
+d(x_n,x_m)
+\leq d(x_n,x)+d(x,x_m)
+<\varepsilon.
+$$
+
+A recíproca não é verdadeira em qualquer espaço. Uma sequência pode aproximar-se indefinidamente de um objeto que não pertence ao espaço onde ela foi construída. É essa possibilidade que a completude elimina.
+
+### Espaços métricos completos
+
+**Definição.** Um espaço métrico $(X,d)$ é **completo** quando toda sequência de Cauchy em $X$ converge para um elemento de $X$.
+
+O exemplo clássico é a diferença entre $\mathbb Q$ e $\mathbb R$. Uma sequência de números racionais pode ser de Cauchy e convergir, em $\mathbb R$, para um número irracional. Por isso, $\mathbb Q$ não é completo com a distância usual.
+
+No nosso problema, a completude terá uma função precisa: depois de provarmos que as aproximações sucessivas formam uma sequência de Cauchy, ela garantirá que o limite existe e ainda é uma função no espaço que definimos.
+
+### O espaço de Banach das funções contínuas
+
+Seja
+
+$$
+J=[t_0-a,t_0+a]
+$$
+
+um intervalo compacto. Denotamos por $C(J;\mathbb R^n)$ o espaço das funções contínuas de $J$ em $\mathbb R^n$. Nesse espaço, usamos a norma da convergência uniforme:
+
+$$
+\lVert y\rVert_\infty
+=
+\sup_{t\in J}|y(t)|.
+$$
+
+A distância associada é
+
+$$
+d_\infty(y,z)
+=
+\lVert y-z\rVert_\infty
+=
+\sup_{t\in J}|y(t)-z(t)|.
+$$
+
+Essa escolha controla simultaneamente a diferença entre duas curvas em todos os instantes de $J$. Um espaço vetorial normado e completo é chamado de **espaço de Banach**.
+
+**Teorema.** O espaço
+
+$$
+\bigl(C(J;\mathbb R^n),\lVert\cdot\rVert_\infty\bigr)
+$$
+
+é um espaço de Banach.
+
+**Demonstração.** Seja $(y_n)_{n\geq0}$ uma sequência de Cauchy para a norma uniforme. Para cada $t\in J$,
+
+$$
+|y_n(t)-y_m(t)|
+\leq
+\lVert y_n-y_m\rVert_\infty.
+$$
+
+Logo, $(y_n(t))_{n\geq0}$ é de Cauchy em $\mathbb R^n$ e podemos definir
+
+$$
+y(t)=\lim_{n\to+\infty}y_n(t).
+$$
+
+Passando ao limite na estimativa uniforme que define a propriedade de Cauchy, obtemos
+
+$$
+\lVert y_n-y\rVert_\infty\longrightarrow0.
+$$
+
+Portanto, $y_n$ converge uniformemente para $y$. Como o limite uniforme de funções contínuas é contínuo, temos $y\in C(J;\mathbb R^n)$. Assim, o espaço é completo.
+
+## Contrações e o teorema do ponto fixo de Banach
+
+### Aplicações contrativas
+
+**Definição.** Seja $(X,d)$ um espaço métrico. Uma aplicação $g:X\to X$ é **contrativa** quando existe $k\in[0,1)$ tal que
+
+$$
+d(g(x),g(y))
+\leq
+k\,d(x,y)
+$$
+
+para todos $x,y\in X$. Equivalentemente, $g$ é $k$-Lipschitz com $k<1$.
+
+O ponto decisivo é a desigualdade estrita $k<1$: a cada aplicação de $g$, as distâncias diminuem por um fator uniforme. Se $x\in X$ satisfaz $g(x)=x$, dizemos que $x$ é um **ponto fixo** de $g$.
+
+### Teorema do ponto fixo de Banach
+
+**Teorema.** Seja $(X,d)$ um espaço métrico completo e não vazio, e seja $g:X\to X$ uma aplicação contrativa. Então $g$ possui um único ponto fixo em $X$.
+
+Além de afirmar a existência do ponto fixo, o teorema fornece uma maneira de encontrá-lo.
+
+### Demonstração: existência por aproximações sucessivas
+
+Escolha $x_0\in X$ e defina
+
+$$
+x_{n+1}=g(x_n),
+\qquad n\geq0.
+$$
+
+Aplicando repetidamente a hipótese de contração,
+
+$$
+d(x_{n+1},x_n)
+\leq
+k^n d(x_1,x_0).
+$$
+
+Se $m>n$, a desigualdade triangular dá
+
+$$
+\begin{aligned}
+d(x_m,x_n)
+&\leq\sum_{j=n}^{m-1}d(x_{j+1},x_j)\\
+&\leq\sum_{j=n}^{m-1}k^j d(x_1,x_0)\\
+&\leq\frac{k^n}{1-k}d(x_1,x_0).
+\end{aligned}
+$$
+
+Como $k<1$, o último termo tende a zero quando $n\to+\infty$. A sequência $(x_n)$ é, portanto, de Cauchy. Pela completude de $X$, existe $x_\infty\in X$ tal que $x_n\to x_\infty$.
+
+Toda contração é contínua. Assim,
+
+$$
+g(x_\infty)
+=g\left(\lim_{n\to+\infty}x_n\right)
+=\lim_{n\to+\infty}g(x_n)
+=\lim_{n\to+\infty}x_{n+1}
+=x_\infty.
+$$
+
+Logo, $x_\infty$ é um ponto fixo de $g$.
+
+A demonstração ainda fornece uma estimativa do erro. Fazendo $m\to+\infty$ na desigualdade anterior,
+
+$$
+d(x_\infty,x_n)
+\leq
+\frac{k^n}{1-k}d(x_1,x_0).
+$$
+
+### Demonstração da unicidade
+
+Se $x$ e $y$ são pontos fixos de $g$, então
+
+$$
+d(x,y)
+=d(g(x),g(y))
+\leq k\,d(x,y).
+$$
+
+Como $k<1$, isso só é possível se $d(x,y)=0$. Portanto, $x=y$.
+
+Temos agora todo o mecanismo que será usado na EDO. A contração faz as aproximações se aproximarem umas das outras, a completude fornece o limite e a continuidade mostra que esse limite é um ponto fixo. A mesma desigualdade de contração garante a unicidade.
+
+## Um teorema local preciso de existência e unicidade
+
+Voltemos às equações diferenciais. Primeiro provaremos uma versão precisa do teorema de Cauchy–Lipschitz, com hipóteses que permitem aplicar diretamente o teorema de Banach.
+
+Fixe $\delta>0$ e $(t_0,x_0)\in\mathbb R\times\mathbb R^n$. Considere o compacto
+
+$$
+A=
+\left\{
+(t,x)\in\mathbb R\times\mathbb R^n:
+|t-t_0|\leq\delta,
+\ |x-x_0|\leq\delta
+\right\}.
+$$
+
+Suponha que $f:A\to\mathbb R^n$ seja contínua e que existam $M,C>0$ tais que
+
+$$
+|f(t,x)|\leq M
+\qquad\text{para todo }(t,x)\in A,
+$$
+
+e
+
+$$
+|f(t,x)-f(t,y)|
+\leq C|x-y|
+$$
+
+sempre que $(t,x),(t,y)\in A$.
+
+A constante $M$ controla quanto uma solução pode se afastar de $x_0$ durante certo intervalo de tempo. A constante $C$ mede quanto o campo vetorial pode separar duas curvas. Defina
+
+$$
+T=
+\min\left\{
+\delta,
+\frac{\delta}{2M},
+\frac{1}{2C}
+\right\}
+$$
+
+e $J=[t_0-T,t_0+T]$. As três restrições têm papéis diferentes: $T\leq\delta$ mantém o tempo dentro de $A$; $MT\leq\delta/2$ mantém a curva dentro da bola espacial; e $CT\leq1/2$ fará a aplicação de Picard ser contrativa.
+
+**Teorema.** Sob essas hipóteses, existe uma única função $x\in C^1(J;\mathbb R^n)$ tal que
+
+$$
+\dot{x}(t)=f(t,x(t)),
+\qquad
+x(t_0)=x_0,
+$$
+
+e $(t,x(t))\in A$ para todo $t\in J$.
+
+### O espaço métrico completo
+
+Considere a bola fechada
+
+$$
+\overline B(x_0,\delta)
+=
+\{x\in\mathbb R^n:|x-x_0|\leq\delta\}
+$$
+
+e defina
+
+$$
+E=C\bigl(J;\overline B(x_0,\delta)\bigr).
+$$
+
+Restringir a imagem das curvas é necessário porque só controlamos $f$ no conjunto $A$. Com a distância
+
+$$
+d_\infty(y,z)
+=
+\lVert y-z\rVert_\infty,
+$$
+
+o espaço $E$ é não vazio e completo: a bola fechada $\overline B(x_0,\delta)$ é completa, e limites uniformes de funções contínuas continuam sendo contínuos.
+
+### A aplicação de Picard envia $E$ em si mesmo
+
+Para $y\in E$, defina
+
+$$
+\Phi(y)(t)
+=
+x_0+\int_{t_0}^{t}f(s,y(s))\,ds.
+$$
+
+A função $\Phi(y)$ é contínua e, para todo $t\in J$,
+
+$$
+\begin{aligned}
+|\Phi(y)(t)-x_0|
+&\leq\left|\int_{t_0}^{t}|f(s,y(s))|\,ds\right|\\
+&\leq M|t-t_0|\\
+&\leq MT\\
+&\leq\frac{\delta}{2}.
+\end{aligned}
+$$
+
+Logo, $\Phi(y)$ permanece em $\overline B(x_0,\delta)$ e
+
+$$
+\Phi:E\longrightarrow E.
+$$
+
+### A aplicação de Picard é contrativa
+
+Sejam $y,z\in E$. Para cada $t\in J$,
+
+$$
+\begin{aligned}
+|\Phi(y)(t)-\Phi(z)(t)|
+&\leq
+\left|\int_{t_0}^{t}|f(s,y(s))-f(s,z(s))|\,ds\right|\\
+&\leq C\left|\int_{t_0}^{t}|y(s)-z(s)|\,ds\right|\\
+&\leq CT\lVert y-z\rVert_\infty\\
+&\leq\frac12\lVert y-z\rVert_\infty.
+\end{aligned}
+$$
+
+Tomando o supremo em $t\in J$,
+
+$$
+\lVert\Phi(y)-\Phi(z)\rVert_\infty
+\leq
+\frac12\lVert y-z\rVert_\infty.
+$$
+
+Portanto, $\Phi$ é uma contração no espaço métrico completo $E$. O teorema de Banach fornece uma única função $x\in E$ tal que $\Phi(x)=x$, isto é,
+
+$$
+x(t)
+=
+x_0+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+Pelo lema da formulação integral, $x$ é uma solução $C^1$ do problema de Cauchy. A unicidade do ponto fixo dá a unicidade entre as soluções cujos gráficos permanecem em $A$ durante o intervalo $J$.
+
+É aqui que o método de Picard reaparece de forma natural. As funções
+
+$$
+y_{n+1}=\Phi(y_n)
+$$
+
+são exatamente as aproximações sucessivas usadas na demonstração de Banach, agora construídas no espaço funcional $E$.
+
+## O teorema de Cauchy–Lipschitz para um campo $C^1$
+
+O teorema anterior deixa todas as estimativas visíveis. Na prática, porém, é mais comum conhecer a regularidade de $f$ do que dispor previamente das constantes $M$ e $C$. A hipótese $f\in C^1$ produz localmente as duas estimativas necessárias.
+
+**Corolário.** Sejam $I\subseteq\mathbb R$ e $U\subseteq\mathbb R^n$ abertos, e seja
+
+$$
+f:I\times U\longrightarrow\mathbb R^n
+$$
+
+de classe $C^1$. Para todo $(t_0,x_0)\in I\times U$, existem $T>0$ e uma solução
+
+$$
+x:[t_0-T,t_0+T]\longrightarrow U
+$$
+
+do problema
+
+$$
+\dot{x}(t)=f(t,x(t)),
+\qquad
+x(t_0)=x_0.
+$$
+
+Além disso, essa solução é localmente única.
+
+### Existência
+
+Como $I\times U$ é aberto e contém $(t_0,x_0)$, podemos escolher $\delta>0$ de modo que
+
+$$
+A=
+\left\{
+(t,x):|t-t_0|\leq\delta,\ |x-x_0|\leq\delta
+\right\}
+$$
+
+esteja contido em $I\times U$. O conjunto $A$ é compacto. Pela continuidade de $f$, existe $M>0$ tal que
+
+$$
+|f(t,x)|\leq M
+\qquad\text{em }A.
+$$
+
+Denote por $\mathrm J_f(t,x)$ a matriz jacobiana de $f$ com respeito à variável $x$. Para uma transformação linear $L$, usamos a norma induzida pela norma euclidiana:
+
+$$
+\lVert L\rVert
+=
+\sup_{|v|=1}|Lv|.
+$$
+
+Como $f$ é de classe $C^1$, a aplicação $(t,x)\mapsto\mathrm J_f(t,x)$ é contínua. Logo, é limitada no compacto $A$: existe $C>0$ tal que
+
+$$
+\lVert\mathrm J_f(t,x)\rVert\leq C
+\qquad\text{em }A.
+$$
+
+A bola $\overline B(x_0,\delta)$ é convexa. Pelo Teorema do Valor Médio, para $(t,x),(t,y)\in A$,
+
+$$
+|f(t,x)-f(t,y)|
+\leq
+\left(
+\sup_{z\in\overline B(x_0,\delta)}
+\lVert\mathrm J_f(t,z)\rVert
+\right)|x-y|
+\leq C|x-y|.
+$$
+
+As hipóteses do teorema local preciso estão satisfeitas. Portanto, com
+
+$$
+T=
+\min\left\{
+\delta,
+\frac{\delta}{2M},
+\frac{1}{2C}
+\right\},
+$$
+
+existe uma solução em $[t_0-T,t_0+T]$.
+
+O papel da hipótese $C^1$ fica, assim, bem concreto: a continuidade limita o campo vetorial numa vizinhança compacta, enquanto a jacobiana limitada torna $f$ Lipschitz na variável $x$.
+
+### Unicidade local
+
+O argumento de ponto fixo dá unicidade entre as curvas que permanecem na bola escolhida. Para comparar a solução $x$ com uma solução qualquer $\widetilde x$ de mesma condição inicial, restringimos as duas a um intervalo suficientemente pequeno ao redor de $t_0$. Pela continuidade, ambas permanecem em $\overline B(x_0,\delta)$ nesse intervalo e satisfazem a mesma equação integral. A unicidade do ponto fixo implica então
+
+$$
+\widetilde x(t)=x(t).
+$$
+
+O mesmo raciocínio pode ser repetido enquanto as duas soluções permanecerem no domínio comum. Assim, elas coincidem em todo intervalo comum que contenha $t_0$.
+
+Concluímos que um campo vetorial $C^1$ determina uma única solução local passando por cada condição inicial. A afirmação é local porque toda a construção utiliza apenas uma vizinhança compacta de $(t_0,x_0)$; prolongar a solução além dela é outra questão.
+
+## Conclusão
+
+Partimos de uma pergunta que o método de Picard, quando apresentado apenas como uma sequência de estimativas, não responde de maneira satisfatória: por que a iteração produz uma solução e por que essa solução é única? O teorema do ponto fixo de Banach mostra que as duas respostas pertencem ao mesmo argumento.
+
+A equação diferencial é primeiro reescrita como
+
+$$
+x(t)
+=
+x_0+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+Essa fórmula define a aplicação de Picard sobre um espaço métrico completo de funções contínuas. A limitação de $f$ mantém as imagens dentro do espaço escolhido; a condição de Lipschitz na variável de estado torna a aplicação contrativa. Banach nos fornece então um único ponto fixo, que é justamente a solução do problema de Cauchy.
+
+As aproximações de Picard
+
+$$
+y_{n+1}=\Phi(y_n)
+$$
+
+deixam, portanto, de parecer um artifício isolado. Elas são a parte construtiva do teorema de Banach. A contração faz as aproximações se aproximarem, a completude garante que seu limite pertence ao espaço funcional e a formulação integral transforma esse ponto fixo novamente numa solução da equação diferencial.
+
+O resultado continua sendo local. Ele não determina até onde a solução poderá ser prolongada nem quais fenômenos podem impedir sua existência global. Essas perguntas levam à teoria das soluções maximais e do prolongamento.
+
+Para o problema local, porém, a ideia central fica exposta: o método de Picard funciona porque é o método das aproximações sucessivas de Banach aplicado num espaço de funções cuidadosamente escolhido. Existência e unicidade não são dois pequenos milagres separados; são consequências do mesmo princípio de ponto fixo.

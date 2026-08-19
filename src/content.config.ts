@@ -10,6 +10,21 @@ const writing = defineCollection({
     updated: z.coerce.date().optional(),
     topics: z.array(z.string()),
     draft: z.boolean().default(false),
+    status: z.enum(["under-construction", "complete"]).default("complete"),
+    featured: z.boolean().default(false),
+  }),
+});
+
+const writingPt = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/writing-pt" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    published: z.coerce.date(),
+    updated: z.coerce.date().optional(),
+    topics: z.array(z.string()),
+    draft: z.boolean().default(false),
+    status: z.enum(["under-construction", "complete"]).default("complete"),
     featured: z.boolean().default(false),
   }),
 });
@@ -45,4 +60,4 @@ const music = defineCollection({
   }),
 });
 
-export const collections = { writing, projects, projectsFr, music };
+export const collections = { writing, writingPt, projects, projectsFr, music };

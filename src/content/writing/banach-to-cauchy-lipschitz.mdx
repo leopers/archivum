@@ -1,20 +1,773 @@
 ---
-title: "Finding ODE solutions through fixed points"
-description: "How Banach's fixed-point theorem reveals the structure behind Picard iteration and the Cauchy–Lipschitz theorem."
+title: "From fixed points to ODE solutions: Banach’s idea"
+description: "How Banach's fixed-point theorem explains Picard's method of successive approximations and the Cauchy–Lipschitz theorem."
 published: 2026-08-18
 topics: [Ordinary Differential Equations, Analysis, Fixed-Point Theory]
 draft: false
+status: complete
 featured: true
 ---
 
 ## Motivation
 
-In most undergraduate ODE courses taught in Brazil, existence and uniqueness are presented as facts to be accepted rather than results to be understood. After learning how to solve a few familiar classes of equations, students are introduced to Picard iteration and told that, under suitable assumptions, it converges to a unique solution. The argument is often compressed into a sequence of estimates, leaving the central question unanswered: why should this procedure establish both existence and uniqueness?
+In many undergraduate ODE courses taught in Brazil, existence and uniqueness are presented more as facts than as results to be understood. Picard’s method of successive approximations is introduced, followed by a sequence of inequalities and the assertion that the approximations converge to a unique solution. What connects these steps is often left implicit.
 
-This was how I first encountered the subject. The Cauchy–Lipschitz theorem seemed to depend on a clever but rather obscure construction specific to differential equations. Picard’s method produced successive approximations, but the deeper reason for their convergence—and for the uniqueness of their limit—remained hidden behind the calculations.
+This was how I first encountered the Cauchy–Lipschitz theorem. Picard’s method seemed like a construction devised specifically for differential equations, while the reason it proved both existence and uniqueness remained hidden inside the calculations.
 
-While studying differential equations in France, I encountered a different presentation. Instead of beginning with Picard iteration, it begins with a general result from analysis: Banach’s fixed-point theorem. An initial-value problem is rewritten as an integral equation, and this equation defines an operator on a suitable space of functions. A solution of the ODE is then precisely a fixed point of this operator.
+In France, I learned a different presentation. One first proves Banach’s fixed-point theorem. The Cauchy problem is then rewritten as an integral equation, which defines a map on a complete space of functions. Its fixed point is precisely a solution of the ODE.
 
-From this perspective, Picard iteration is no longer an isolated trick. It is simply the repeated application of a contraction, and its convergence follows from the completeness of the underlying function space. Existence and uniqueness are not separate miracles: both are consequences of the same fixed-point principle.
+From this viewpoint, Picard’s method is simply the method of successive approximations applied to a contracting map. The aim of this article is to make that argument explicit, beginning with the necessary metric-space foundations and ending with the local Cauchy–Lipschitz theorem.
 
-The purpose of this article is to develop this connection carefully. We will first establish Banach’s fixed-point theorem and understand the role played by completeness and contraction. We will then construct the Picard operator associated with an initial-value problem and show how the local Cauchy–Lipschitz theorem follows from it. The goal is to replace an opaque procedure with a clear structural argument—and to make explicit the reasoning that is too often left between the lines.
+## The initial-value problem
+
+Let $I\subseteq\mathbb{R}$ be an interval, let $U\subseteq\mathbb{R}^n$ be open, and consider a function
+
+$$
+f:I\times U\longrightarrow\mathbb{R}^n.
+$$
+
+Given an initial time $t_0\in I$ and an initial state $x_0\in U$, we want to study the problem
+
+$$
+\begin{cases}
+\dot{x}(t)=f(t,x(t)),\\
+x(t_0)=x_0.
+\end{cases}
+$$
+
+This is an **initial-value problem**, also called a **Cauchy problem**. Let $J\subseteq I$ be an interval containing $t_0$. A function
+
+$$
+x:J\longrightarrow U
+$$
+
+is a solution on $J$ if $x\in C^1(J,U)$ and
+
+$$
+x(t_0)=x_0,
+\qquad
+\dot{x}(t)=f(t,x(t))
+\quad\text{for every }t\in J.
+$$
+
+The interval $J$ is part of the solution. We initially ask two distinct questions.
+
+**Existence.** Is there an interval $J$ containing $t_0$ on which at least one solution is defined?
+
+**Uniqueness.** If $x_1$ and $x_2$ are two solutions with the same initial condition, must they agree wherever they are both defined near $t_0$?
+
+The Cauchy–Lipschitz theorem gives conditions on $f$ that answer both questions locally, on an interval around $t_0$.
+
+Neither question asks for a closed formula. Before trying to calculate a solution, we must know that there is a well-defined solution to calculate. This is where the problem becomes one of analysis rather than symbolic manipulation.
+
+### From the differential equation to an integral equation
+
+**Lemma.** Suppose that $f$ is continuous. A continuous function $x:J\to U$ solves the Cauchy problem if and only if
+
+$$
+x(t)=x_0+\int_{t_0}^{t}f(s,x(s))\,ds
+\qquad\text{for every }t\in J.
+$$
+
+**Proof.** If $x$ is a solution, the fundamental theorem of calculus gives
+
+$$
+x(t)-x(t_0)
+=
+\int_{t_0}^{t}\dot{x}(s)\,ds
+=
+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+The initial condition gives the integral formula. Conversely, if the formula holds, then
+
+$$
+t\longmapsto\int_{t_0}^{t}f(s,x(s))\,ds
+$$
+
+is continuously differentiable. Differentiating recovers
+
+$$
+\dot{x}(t)=f(t,x(t)),
+$$
+
+and evaluation at $t=t_0$ gives $x(t_0)=x_0$.
+
+This equivalence is the key change of viewpoint. After replacing differentiation by integration, the unknown curve can be treated as the input of a map acting on functions.
+
+The integral formulation reveals the fixed-point structure. Define the Picard map $\Phi$ by
+
+$$
+\Phi(y)(t)
+=
+x_0+\int_{t_0}^{t}f(s,y(s))\,ds.
+$$
+
+Solving the initial-value problem is therefore equivalent to finding $x$ such that
+
+$$
+\Phi(x)=x.
+$$
+
+The problem is now to choose a complete function space on which $\Phi$ is contracting.
+
+## Metric and complete spaces
+
+Because $\Phi$ acts on functions, we need a way to measure the distance between two functions. We must also ensure that when successive approximations approach one another, their limit remains in the space under consideration. These are exactly the roles of a metric and completeness.
+
+### Distances and metric spaces
+
+**Definition.** Let $X$ be a set and let
+
+$$
+d:X\times X\longrightarrow[0,+\infty)
+$$
+
+be a map. We say that $d$ is a **distance** on $X$ if, for all $x,y,z\in X$,
+
+$$
+\begin{aligned}
+d(x,y)=0 &\quad\Longleftrightarrow\quad x=y &&\text{(separation)},\\
+d(x,y)&=d(y,x) &&\text{(symmetry)},\\
+d(x,z)&\leq d(x,y)+d(y,z) &&\text{(triangle inequality)}.
+\end{aligned}
+$$
+
+The pair $(X,d)$ is then called a **metric space**.
+
+**Definition.** A sequence $(x_n)_{n\geq 0}$ in $X$ converges to $x\in X$ if
+
+$$
+d(x_n,x)\longrightarrow 0
+\qquad\text{as }n\longrightarrow+\infty.
+$$
+
+It is a **Cauchy sequence** if
+
+$$
+\forall\varepsilon>0,\quad
+\exists n_0\in\mathbb{N},\quad
+\forall n,m\geq n_0,\quad
+d(x_n,x_m)<\varepsilon.
+$$
+
+**Proposition.** Every convergent sequence is a Cauchy sequence.
+
+**Proof.** Suppose that $x_n\to x$. Given $\varepsilon>0$, there exists $n_0\in\mathbb{N}$ such that
+
+$$
+n\geq n_0
+\quad\Longrightarrow\quad
+d(x_n,x)<\frac{\varepsilon}{2}.
+$$
+
+Hence, for all $n,m\geq n_0$, the triangle inequality gives
+
+$$
+d(x_n,x_m)
+\leq d(x_n,x)+d(x,x_m)
+<\varepsilon.
+$$
+
+The converse need not hold.
+
+This distinction is important because the method of successive approximations first gives information about the distance between two terms of a sequence. It does not provide the limit in advance. The Cauchy property is therefore the natural intermediate step in the fixed-point proof.
+
+### Complete metric spaces
+
+**Definition.** A metric space $(X,d)$ is **complete** if every Cauchy sequence in $X$ converges in $X$.
+
+The limit must belong to the space. For example, $\mathbb{Q}$ with the usual distance is not complete: a Cauchy sequence of rational numbers may converge in $\mathbb{R}$ to an irrational number.
+
+Completeness rules out precisely this loss of the limit. Later, once the successive approximations are shown to form a Cauchy sequence, completeness will turn that asymptotic information into the existence of a point in the space.
+
+### The Banach space of continuous functions
+
+Let
+
+$$
+J=[t_0-a,t_0+a]
+$$
+
+be a compact interval. We denote by
+
+$$
+C(J;\mathbb{R}^n)
+$$
+
+the vector space of continuous functions from $J$ to $\mathbb{R}^n$. On this space, consider the norm of uniform convergence
+
+$$
+\lVert y\rVert_\infty
+=
+\sup_{t\in J}|y(t)|.
+$$
+
+The associated distance is
+
+$$
+d_\infty(y,z)
+=
+\lVert y-z\rVert_\infty
+=
+\sup_{t\in J}|y(t)-z(t)|.
+$$
+
+A complete normed vector space is a **Banach space**.
+
+For the Cauchy problem, the relevant space is not merely $\mathbb{R}^n$ but a space of continuous curves. The norm of uniform convergence is the appropriate choice because it controls two curves simultaneously at every time in $J$.
+
+**Theorem.** The space
+
+$$
+\bigl(C(J;\mathbb{R}^n),\lVert\cdot\rVert_\infty\bigr)
+$$
+
+is a Banach space.
+
+**Proof.** Let $(y_n)_{n\geq 0}$ be a Cauchy sequence for $\lVert\cdot\rVert_\infty$. For every $t\in J$ and $n,m\geq 0$,
+
+$$
+|y_n(t)-y_m(t)|
+\leq
+\lVert y_n-y_m\rVert_\infty.
+$$
+
+Thus $(y_n(t))_{n\geq 0}$ is Cauchy in $\mathbb{R}^n$, so we may define
+
+$$
+y(t)=\lim_{n\to+\infty}y_n(t).
+$$
+
+Given $\varepsilon>0$, there exists $n_0\in\mathbb{N}$ such that, for all $n,m\geq n_0$,
+
+$$
+\lVert y_n-y_m\rVert_\infty<\varepsilon.
+$$
+
+Letting $m\to+\infty$ yields, for every $n\geq n_0$,
+
+$$
+\lVert y_n-y\rVert_\infty\leq\varepsilon.
+$$
+
+Thus $y_n\to y$ uniformly on $J$. A uniform limit of continuous functions is continuous, so $y\in C(J;\mathbb{R}^n)$. Therefore the space is complete.
+
+Completeness keeps the limit inside the space of continuous functions. We now need a map that forces the successive approximations to approach one another.
+
+## Contractions and Banach’s fixed-point theorem
+
+### Contracting maps
+
+**Definition.** Let $(X,d)$ be a metric space. A map
+
+$$
+f:X\longrightarrow X
+$$
+
+is said to be **contracting** if there exists $k\in[0,1)$ such that, for all $x,y\in X$,
+
+$$
+d\bigl(f(x),f(y)\bigr)
+\leq
+k\,d(x,y).
+$$
+
+Equivalently, $f$ is $k$-Lipschitz with $k<1$.
+
+The condition $k<1$ is what distinguishes a contraction from an arbitrary Lipschitz map: every application reduces distances by a uniform factor. Repeating the map therefore produces geometric decay.
+
+In particular, every contracting map is continuous. Indeed, if $x_n\to x$, then
+
+$$
+d\bigl(f(x_n),f(x)\bigr)
+\leq
+k\,d(x_n,x)
+\longrightarrow 0.
+$$
+
+A point $x\in X$ is a **fixed point** of $f$ if
+
+$$
+f(x)=x.
+$$
+
+### Banach’s fixed-point theorem
+
+**Theorem.** Let $(X,d)$ be a nonempty complete metric space and let $f:X\to X$ be a contracting map. Then $f$ has a unique fixed point in $X$.
+
+The theorem is constructive. It does not assume that the fixed point is already known; it produces it from an arbitrary starting point.
+
+### Proof: existence by successive approximations
+
+Choose any $x_0\in X$ and define the sequence $(x_n)_{n\geq 0}$ by
+
+$$
+x_{n+1}=f(x_n),
+\qquad n\geq 0.
+$$
+
+Successive applications of the contraction property give, for every $n\geq 0$,
+
+$$
+d(x_{n+1},x_n)
+\leq
+k^n d(x_1,x_0).
+$$
+
+Let $m>n$. By the triangle inequality,
+
+$$
+\begin{aligned}
+d(x_m,x_n)
+&\leq
+\sum_{j=n}^{m-1}d(x_{j+1},x_j)\\
+&\leq
+\sum_{j=n}^{m-1}k^j d(x_1,x_0)\\
+&\leq
+\frac{k^n}{1-k}d(x_1,x_0).
+\end{aligned}
+$$
+
+Since $k\in[0,1)$,
+
+$$
+\frac{k^n}{1-k}d(x_1,x_0)
+\longrightarrow 0
+\qquad\text{as }n\longrightarrow+\infty.
+$$
+
+Therefore $(x_n)_{n\geq 0}$ is a Cauchy sequence. Since $X$ is complete, there exists $x_\infty\in X$ such that
+
+$$
+x_n\longrightarrow x_\infty.
+$$
+
+The map $f$ is continuous, and hence
+
+$$
+f(x_\infty)
+=
+f\left(\lim_{n\to+\infty}x_n\right)
+=
+\lim_{n\to+\infty}f(x_n)
+=
+\lim_{n\to+\infty}x_{n+1}
+=
+x_\infty.
+$$
+
+Thus $x_\infty$ is a fixed point of $f$.
+
+### Error bound
+
+The preceding proof also controls the error after a finite number of successive approximations. Letting $m\to+\infty$ in the inequality above gives
+
+$$
+d(x_\infty,x_n)
+\leq
+\frac{k^n}{1-k}d(x_1,x_0).
+$$
+
+This bounds the error after $n$ successive approximations.
+
+### Proof of uniqueness
+
+Suppose that $x,y\in X$ are fixed points of $f$. Then
+
+$$
+d(x,y)
+=
+d\bigl(f(x),f(y)\bigr)
+\leq
+k\,d(x,y).
+$$
+
+Since $k<1$, necessarily $d(x,y)=0$, hence $x=y$.
+
+This is the mechanism we will use for the ODE: contraction makes the successive approximations Cauchy, completeness supplies their limit, and continuity identifies that limit as a fixed point. The same contraction inequality gives uniqueness.
+
+## A precise local existence and uniqueness theorem
+
+We can now translate this abstract argument back to differential equations. We first prove a precise form of the Cauchy–Lipschitz theorem whose hypotheses allow a direct application of Banach’s theorem.
+
+Let $\delta>0$ and $(t_0,x_0)\in\mathbb{R}\times\mathbb{R}^n$. Define
+
+$$
+A=
+\left\{
+(t,x)\in\mathbb{R}\times\mathbb{R}^n:
+|t-t_0|\leq\delta,
+\ |x-x_0|\leq\delta
+\right\}.
+$$
+
+Suppose that $f:A\to\mathbb{R}^n$ is continuous and that there exist $M,C>0$ such that
+
+$$
+|f(t,x)|\leq M
+\qquad
+\text{for every }(t,x)\in A,
+$$
+
+and
+
+$$
+|f(t,x)-f(t,y)|
+\leq
+C|x-y|
+$$
+
+whenever $(t,x),(t,y)\in A$.
+
+The constant $M$ controls how far a solution can move during a given time, while $C$ controls how differently two curves are transformed by the vector field. These two bounds determine the interval on which the fixed-point construction works.
+
+Set
+
+$$
+T=
+\min\left\{
+\delta,
+\frac{\delta}{2M},
+\frac{1}{2C}
+\right\}
+$$
+
+and
+
+$$
+J=[t_0-T,t_0+T].
+$$
+
+The three terms in the definition of $T$ have distinct roles. The condition $T\leq\delta$ keeps time inside $A$; $MT\leq\delta/2$ keeps the curve inside the spatial ball; and $CT\leq1/2$ makes the Picard map contracting.
+
+**Theorem.** Under the preceding hypotheses, there exists a unique function $x\in C^1(J;\mathbb{R}^n)$ satisfying
+
+$$
+\dot{x}(t)=f(t,x(t)),
+\qquad
+x(t_0)=x_0,
+$$
+
+and
+
+$$
+(t,x(t))\in A
+\qquad
+\text{for every }t\in J.
+$$
+
+### The complete metric space
+
+Let
+
+$$
+\overline{B}(x_0,\delta)
+=
+\left\{
+x\in\mathbb{R}^n:
+|x-x_0|\leq\delta
+\right\}
+$$
+
+and define
+
+$$
+E=C\bigl(J;\overline{B}(x_0,\delta)\bigr).
+$$
+
+Restricting the image of the curves is essential. The function $f$ is only controlled on $A$, so the Picard map must not be allowed to evaluate $f$ outside this set.
+
+Equip $E$ with the distance
+
+$$
+d_\infty(y,z)
+=
+\lVert y-z\rVert_\infty
+=
+\sup_{t\in J}|y(t)-z(t)|.
+$$
+
+The constant function $t\mapsto x_0$ belongs to $E$, so $E$ is nonempty. Moreover, $\overline{B}(x_0,\delta)$ is a closed subset of $\mathbb{R}^n$ and is therefore complete. Since $J$ is compact, $(E,d_\infty)$ is complete.
+
+### The Picard map
+
+For $y\in E$, define
+
+$$
+\Phi(y)(t)
+=
+x_0+
+\int_{t_0}^{t}f(s,y(s))\,ds.
+$$
+
+The function $\Phi(y)$ is continuous. For every $t\in J$,
+
+$$
+\begin{aligned}
+|\Phi(y)(t)-x_0|
+&=
+\left|
+\int_{t_0}^{t}f(s,y(s))\,ds
+\right|\\
+&\leq
+\left|
+\int_{t_0}^{t}|f(s,y(s))|\,ds
+\right|\\
+&\leq
+M|t-t_0|\\
+&\leq
+MT\\
+&\leq
+\frac{\delta}{2}.
+\end{aligned}
+$$
+
+Hence $\Phi(y)\in E$, so
+
+$$
+\Phi:E\longrightarrow E.
+$$
+
+### The Picard map is contracting
+
+Let $y,z\in E$. For every $t\in J$, the Lipschitz hypothesis on $f$ gives
+
+$$
+\begin{aligned}
+|\Phi(y)(t)-\Phi(z)(t)|
+&=
+\left|
+\int_{t_0}^{t}
+\bigl(f(s,y(s))-f(s,z(s))\bigr)\,ds
+\right|\\
+&\leq
+C\left|
+\int_{t_0}^{t}|y(s)-z(s)|\,ds
+\right|\\
+&\leq
+CT\lVert y-z\rVert_\infty\\
+&\leq
+\frac{1}{2}\lVert y-z\rVert_\infty.
+\end{aligned}
+$$
+
+Taking the supremum over $t\in J$, we obtain
+
+$$
+\lVert\Phi(y)-\Phi(z)\rVert_\infty
+\leq
+\frac{1}{2}\lVert y-z\rVert_\infty.
+$$
+
+Thus $\Phi$ is a contracting map on the nonempty complete metric space $(E,d_\infty)$.
+
+All the hypotheses of Banach’s theorem are now verified. Through the integral formulation, its fixed point will be the desired solution.
+
+### Conclusion of the proof
+
+Banach’s fixed-point theorem gives a unique $x\in E$ such that
+
+$$
+\Phi(x)=x.
+$$
+
+Equivalently,
+
+$$
+x(t)
+=
+x_0+
+\int_{t_0}^{t}f(s,x(s))\,ds
+\qquad
+\text{for every }t\in J.
+$$
+
+By the integral formulation lemma, $x\in C^1(J;\mathbb{R}^n)$ solves the Cauchy problem. The uniqueness of the fixed point gives uniqueness among solutions whose graphs remain in $A$ on $J$.
+
+Picard’s successive approximations are therefore not an additional argument attached to the theorem. They are the successive approximations from Banach’s proof, now carried out in the function space $E$.
+
+## The Cauchy–Lipschitz theorem for a $C^1$ vector field
+
+The precise theorem makes every estimate visible, but in most applications one starts from a regularity assumption on $f$ rather than from explicit constants. A $C^1$ vector field supplies the required bounds locally.
+
+**Corollary.** Let $I\subseteq\mathbb{R}$ and $U\subseteq\mathbb{R}^n$ be open, and let
+
+$$
+f:I\times U\longrightarrow\mathbb{R}^n
+$$
+
+be of class $C^1$. For every $(t_0,x_0)\in I\times U$, there exist $T>0$ and a solution
+
+$$
+x:[t_0-T,t_0+T]\longrightarrow U
+$$
+
+of
+
+$$
+\dot{x}(t)=f(t,x(t)),
+\qquad
+x(t_0)=x_0.
+$$
+
+Moreover, this solution is locally unique: if $\widetilde J\subseteq[t_0-T,t_0+T]$ is an interval containing $t_0$ and $\widetilde x:\widetilde J\to U$ is another solution with $\widetilde x(t_0)=x_0$, then
+
+$$
+\widetilde x(t)=x(t)
+\qquad
+\text{for every }t\in\widetilde J.
+$$
+
+### Proof of existence
+
+Since $I\times U$ is open and $(t_0,x_0)\in I\times U$, there exists $\delta>0$ such that
+
+$$
+A=
+\left\{
+(t,x)\in\mathbb{R}\times\mathbb{R}^n:
+|t-t_0|\leq\delta,
+\ |x-x_0|\leq\delta
+\right\}
+$$
+
+is contained in $I\times U$. The set $A$ is compact.
+
+Because $f$ is continuous, it is bounded on $A$. Thus there exists $M>0$ such that
+
+$$
+|f(t,x)|\leq M
+\qquad
+\text{for every }(t,x)\in A.
+$$
+
+Let $\mathrm J_f(t,x)$ denote the Jacobian matrix of $f$ with respect to $x$. For a matrix $L$, we use the norm induced by the Euclidean norm,
+
+$$
+\lVert L\rVert
+=
+\sup_{|v|=1}|Lv|.
+$$
+
+This is the largest factor by which $L$ can stretch a vector. Since $f$ is of class $C^1$, the map $(t,x)\mapsto\mathrm J_f(t,x)$ is continuous. It is bounded on $A$, so there exists $C>0$ such that
+
+$$
+\lVert\mathrm J_f(t,x)\rVert
+\leq C
+\qquad
+\text{for every }(t,x)\in A.
+$$
+
+Since $\overline B(x_0,\delta)$ is convex, the mean value inequality gives, for $(t,x),(t,y)\in A$,
+
+$$
+|f(t,x)-f(t,y)|
+\leq
+\left(
+\sup_{z\in\overline B(x_0,\delta)}
+\lVert\mathrm J_f(t,z)\rVert
+\right)
+|x-y|
+\leq
+C|x-y|.
+$$
+
+The hypotheses of the precise local theorem are therefore satisfied. With
+
+$$
+T=
+\min\left\{
+\delta,
+\frac{\delta}{2M},
+\frac{1}{2C}
+\right\},
+$$
+
+that theorem gives a solution on $[t_0-T,t_0+T]$.
+
+Thus the role of the $C^1$ hypothesis is concrete: continuity bounds the vector field on a compact neighborhood, while the bounded Jacobian makes it Lipschitz with respect to the state variable.
+
+### Proof of uniqueness
+
+The fixed-point argument gives uniqueness among functions in
+
+$$
+E=C\bigl([t_0-T,t_0+T];\overline B(x_0,\delta)\bigr).
+$$
+
+We remove the restriction on the image by a continuation argument.
+
+We prove the assertion to the right of $t_0$; the proof to the left is identical. It is enough to fix an arbitrary closed interval
+
+$$
+[a,b]\subseteq\widetilde J
+$$
+
+with $a\leq t_0\leq b$, and define
+
+$$
+\gamma=
+\sup\left\{
+t\in[t_0,b]:
+\widetilde x(s)\in\overline B(x_0,\delta)
+\text{ for every }s\in[t_0,t]
+\right\}.
+$$
+
+Since $\widetilde x(t_0)=x_0$ and $\widetilde x$ is continuous, $\gamma$ is well defined and $\gamma>t_0$. On $[t_0,\gamma]$, both $x$ and $\widetilde x$ satisfy the same integral equation and take their values in $\overline B(x_0,\delta)$. The fixed-point uniqueness argument, applied on this shorter interval, gives
+
+$$
+\widetilde x(t)=x(t)
+\qquad
+\text{for every }t\in[t_0,\gamma].
+$$
+
+The construction of $x$ gives the sharper bound
+
+$$
+|x(t)-x_0|
+\leq
+\frac{\delta}{2}
+\qquad
+\text{for every }t\in[t_0-T,t_0+T].
+$$
+
+Consequently,
+
+$$
+|\widetilde x(\gamma)-x_0|
+\leq
+\frac{\delta}{2}.
+$$
+
+If $\gamma<b$, continuity of $\widetilde x$ would imply that $\widetilde x(t)$ remains in $\overline B(x_0,\delta)$ for times slightly larger than $\gamma$, contradicting the definition of $\gamma$. Hence $\gamma=b$, and the two solutions coincide on $[t_0,b]$. The same argument shows that they coincide on $[a,t_0]$. Since $[a,b]\subseteq\widetilde J$ was arbitrary, they coincide on all of $\widetilde J$.
+
+Thus a $C^1$ vector field determines a unique local solution through every initial condition. The conclusion is local because the construction only uses a compact neighborhood of $(t_0,x_0)$; extending the solution beyond this neighborhood is a separate question.
+
+## Conclusion
+
+We began with a question that Picard’s method, when presented only as a sequence of estimates, does not fully answer: why does the iteration produce a solution, and why can there be only one? Banach’s fixed-point theorem reveals that these are two parts of the same argument.
+
+The differential equation is first rewritten as the integral equation
+
+$$
+x(t)
+=
+x_0+
+\int_{t_0}^{t}f(s,x(s))\,ds.
+$$
+
+This formula defines the Picard map $\Phi$ on a complete metric space of continuous functions. The bound on $f$ keeps its images inside the chosen space, while the Lipschitz condition with respect to the state variable makes it contracting. Banach’s theorem then supplies a unique fixed point, which is precisely the solution of the Cauchy problem.
+
+Picard’s successive approximations
+
+$$
+y_{n+1}=\Phi(y_n)
+$$
+
+are not a separate trick. They are the constructive part of Banach’s theorem. The contraction makes the approximations converge, completeness keeps their limit in the function space, and the integral formulation turns that fixed point back into a solution of the differential equation.
+
+The theorem is local. It guarantees a unique solution near the initial time, but it does not determine how far that solution can be extended or what may obstruct global existence. Those questions belong to the theory of maximal solutions and continuation.
+
+For the local problem, however, the apparent mystery is gone. Picard’s method works because it is Banach’s method of successive approximations in a carefully chosen function space. Existence and uniqueness are not separate conclusions reached by unrelated calculations; they are consequences of the same fixed-point principle.

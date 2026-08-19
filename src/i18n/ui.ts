@@ -1,9 +1,10 @@
-export const locales = ["en", "fr"] as const;
+export const locales = ["en", "fr", "pt-br"] as const;
 export type Locale = (typeof locales)[number];
 
 export const languageNames: Record<Locale, string> = {
   en: "English",
   fr: "Français",
+  "pt-br": "Português do Brasil",
 };
 
 export const ui = {
@@ -64,6 +65,7 @@ export const ui = {
       "Music is the other constant in my life. I’m an amateur guitarist and an enthusiastic listener, moving freely between indie, progressive rock, metal, techno, trance, and whatever else catches my ear.",
     elsewhere: "Elsewhere",
     researchNote: "Writing",
+    underConstruction: "Under construction",
     project: "Project",
     sourceCode: "Source code",
     filedUnder: "Filed under",
@@ -126,10 +128,74 @@ export const ui = {
       "La musique est l’autre constante de ma vie. Guitariste amateur et auditeur curieux, je passe volontiers de l’indie au rock progressif, du metal à la techno ou à la trance, selon le moment.",
     elsewhere: "Ailleurs",
     researchNote: "Texte",
+    underConstruction: "En construction",
     project: "Projet",
     sourceCode: "Code source",
     filedUnder: "Sujets",
     englishOnly: "Cet article est actuellement disponible en anglais.",
+  },
+  "pt-br": {
+    nav: {
+      writing: "Textos",
+      projects: "Projetos",
+      topics: "Temas",
+      music: "Música",
+      about: "Sobre",
+    },
+    footer: "Um caderno vivo.",
+    personalArchive: "Aprendizado",
+    homeBio1:
+      "Brasileiro e atualmente estudante de engenharia na École Polytechnique. Me interesso fortemente pela interseção entre matemática aplicada e computação — do aprendizado de máquina à eletrônica.",
+    homeBio2:
+      "Uso este site para registrar o que estudo, construo e penso, com alguns desvios ocasionais pela música.",
+    recentWriting: "Textos recentes",
+    allNotes: "Todos os textos",
+    projects: "Projetos",
+    allProjects: "Todos os projetos",
+    status: {
+      ongoing: "Em andamento",
+      complete: "Concluído",
+      archived: "Arquivado",
+    },
+    writingLabel: "Textos",
+    writingTitle: "Notas e ensaios",
+    writingDesc: "Textos que nascem dos meus estudos.",
+    work: "Trabalhos",
+    projectsDesc: "Projetos de programação e pesquisa.",
+    index: "Índice",
+    topics: "Temas",
+    topicsDesc: "Textos e projetos organizados por assunto.",
+    entries: "entradas",
+    entry: "entrada",
+    music: "Música",
+    musicTitle: "Escuta e escrita",
+    musicDesc: "Playlists e textos sobre música.",
+    spotifyProfile: "Perfil no Spotify",
+    featuredPlaylists: "Playlists em destaque",
+    musicWriting: "Textos sobre música",
+    musicEmpty: "Meus textos sobre música aparecerão aqui.",
+    about: "Sobre",
+    aboutTitle: "",
+    aboutIntro:
+      "Sou brasileiro e atualmente estudo engenharia na École Polytechnique, na França.",
+    background: "Formação",
+    background1:
+      "Antes de vir para a França, cursei Engenharia de Computação no ITA (Instituto Tecnológico de Aeronáutica). A formação me deu uma base forte em teoria da computação e projetos em hardware e despertou meu interesse pelas várias camadas entre ideias abstratas e as máquinas que as tornam concretas.",
+    background2:
+      "Na École Polytechnique, estou explorando essa relação por outro ângulo, com um foco maior em matemática aplicada. Tenho interesse especial por aprendizado de máquina, inteligência artificial, verificação formal e eletrônica — principalmente por problemas que atravessam mais de uma dessas áreas.",
+    thisArchive: "Este arquivo",
+    archiveText:
+      "Este site é onde desenvolvo ideias em público. Reúno notas de estudo, documento projetos e guardo pequenas intuições que seriam fáceis de perder depois do fim de um curso ou experimento.",
+    outside: "Fora dos estudos",
+    outsideText:
+      "A música é a outra constante da minha vida. Sou um guitarrista amador e passo a maior parte do meu tempo ouvindo do indie ao rock progressivo, do metal ao techno e ao trance conforme o momento.",
+    elsewhere: "Outros lugares",
+    researchNote: "Texto",
+    underConstruction: "Em construção",
+    project: "Projeto",
+    sourceCode: "Código-fonte",
+    filedUnder: "Temas",
+    englishOnly: "Este conteúdo ainda está disponível apenas em inglês.",
   },
 } as const;
 

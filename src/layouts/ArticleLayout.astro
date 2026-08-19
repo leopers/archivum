@@ -3,7 +3,8 @@ import BaseLayout from "./BaseLayout.astro";
 import { localePath, ui, type Locale } from "../i18n/ui";
 const { data, locale = "en", englishOnly = false } = Astro.props;
 const t = ui[locale as Locale];
-const dateLocale = locale === "fr" ? "fr-FR" : "en-GB";
+const dateLocale =
+  locale === "fr" ? "fr-FR" : locale === "pt-br" ? "pt-BR" : "en-GB";
 const date = data.published
   ? data.published.toLocaleDateString(dateLocale, {
       day: "numeric",
@@ -24,7 +25,12 @@ const date = data.published
           >{data.title}</h1
         ><div class="article-sub">
           {data.description}
-        </div><div class="article-meta">{date} · {data.topics.join(" / ")}</div>
+        </div><div class="article-meta">
+          <span>{date} · {data.topics.join(" / ")}</span>
+          {data.status === "under-construction" && (
+            <span class="construction-label">{t.underConstruction}</span>
+          )}
+        </div>
         {
           data.repo && (
             <a

@@ -10,7 +10,7 @@ export default defineConfig({
   adapter: cloudflare({ imageService: "passthrough" }),
   site: "https://leopers.dev",
   i18n: {
-    locales: ["en", "fr"],
+    locales: ["en", "fr", "pt-br"],
     defaultLocale: "en",
     routing: { prefixDefaultLocale: false },
   },
