@@ -1,0 +1,128 @@
+---
+import { ui, type Locale } from "../i18n/ui";
+
+const { locale = "en" } = Astro.props as { locale?: Locale };
+const t = ui[locale].comments;
+const normalizedPath = Astro.url.pathname
+  .replace(/^\/(fr|pt-br)\//, "/")
+  .replace(/^\//, "")
+  .replace(/\/$/, "");
+---
+
+<section
+  class="comments-section"
+  data-comments
+  data-content-key={normalizedPath}
+  data-locale={locale}
+>
+  <header class="comments-heading">
+    <div>
+      <span class="eyebrow">{t.label}</span>
+      <h2>{t.title}</h2>
+    </div>
+    <p>{t.intro}</p>
+  </header>
+
+  <div class="comments-list" data-comments-list aria-live="polite">
+    <p class="comments-empty" data-comments-empty>{t.loading}</p>
+  </div>
+
+  <form class="comment-form" data-comment-form>
+    <label>
+      <span>{t.name}</span>
+      <input name="authorName" maxlength="60" autocomplete="name" required />
+    </label>
+    <label class="comment-message">
+      <span>{t.message}</span>
+      <textarea name="body" rows="5" minlength="10" maxlength="2000" required
+      ></textarea>
+    </label>
+    <label class="comment-trap" aria-hidden="true">
+      Website
+      <input name="website" tabindex="-1" autocomplete="off" />
+    </label>
+    <div class="comment-form-footer">
+      <small>{t.moderation}</small>
+      <button type="submit">{t.submit}</button>
+    </div>
+    <p class="comment-status" data-comment-status role="status"></p>
+  </form>
+</section>
+
+<script is:inline define:vars={{ labels: t }}>
+  const root = document.querySelector("[data-comments]");
+  if (root) {
+    const list = root.querySelector("[data-comments-list]");
+    const form = root.querySelector("[data-comment-form]");
+    const status = root.querySelector("[data-comment-status]");
+    const contentKey = root.dataset.contentKey;
+    const locale = root.dataset.locale;
+
+    const escapeHtml = (value) => {
+      const element = document.createElement("span");
+      element.textContent = value;
+      return element.innerHTML;
+    };
+
+    const formatDate = (value) =>
+      new Intl.DateTimeFormat(
+        locale === "pt-br" ? "pt-BR" : locale === "fr" ? "fr-FR" : "en-GB",
+        { day: "numeric", month: "long", year: "numeric" },
+      ).format(new Date(value + (value.endsWith("Z") ? "" : "Z")));
+
+    const loadComments = async () => {
+      try {
+        const response = await fetch(
+          `/api/comments?content=${encodeURIComponent(contentKey)}&locale=${encodeURIComponent(locale)}`,
+        );
+        if (!response.ok) throw new Error();
+        const { comments } = await response.json();
+        if (!comments.length) {
+          list.innerHTML = `<p class="comments-empty">${escapeHtml(labels.empty)}</p>`;
+          return;
+        }
+        list.innerHTML = comments
+          .map(
+            (comment) => `<article class="comment">
+              <header><strong>${escapeHtml(comment.author_name)}</strong><time>${formatDate(comment.created_at)}</time></header>
+              <p>${escapeHtml(comment.body).replaceAll("\n", "<br>")}</p>
+            </article>`,
+          )
+          .join("");
+      } catch {
+        list.innerHTML = `<p class="comments-empty">${escapeHtml(labels.unavailable)}</p>`;
+      }
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = form.querySelector("button");
+      const fields = new FormData(form);
+      button.disabled = true;
+      status.textContent = labels.sending;
+      try {
+        const response = await fetch("/api/comments", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            contentKey,
+            locale,
+            authorName: fields.get("authorName"),
+            body: fields.get("body"),
+            website: fields.get("website"),
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || labels.error);
+        form.reset();
+        status.textContent = labels.success;
+      } catch (error) {
+        status.textContent = error.message || labels.error;
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    loadComments();
+  }
+</script>

@@ -70,6 +70,22 @@ export const ui = {
     sourceCode: "Source code",
     filedUnder: "Filed under",
     englishOnly: "This article is currently available in English.",
+    comments: {
+      label: "Discussion",
+      title: "Comments & suggestions",
+      intro:
+        "Questions, corrections, and suggestions are welcome. I read every message before it appears here.",
+      loading: "Loading comments…",
+      empty: "No comments yet. You can start the conversation.",
+      unavailable: "Comments are temporarily unavailable.",
+      name: "Name",
+      message: "Comment",
+      moderation: "Comments are published after moderation.",
+      submit: "Send comment",
+      sending: "Sending…",
+      success: "Thank you. Your comment is awaiting moderation.",
+      error: "Your comment could not be sent. Please try again.",
+    },
   },
   fr: {
     nav: {
@@ -133,6 +149,23 @@ export const ui = {
     sourceCode: "Code source",
     filedUnder: "Sujets",
     englishOnly: "Cet article est actuellement disponible en anglais.",
+    comments: {
+      label: "Discussion",
+      title: "Commentaires et suggestions",
+      intro:
+        "Questions, corrections et suggestions sont les bienvenues. Je lis chaque message avant sa publication.",
+      loading: "Chargement des commentaires…",
+      empty:
+        "Aucun commentaire pour le moment. Vous pouvez ouvrir la discussion.",
+      unavailable: "Les commentaires sont temporairement indisponibles.",
+      name: "Nom",
+      message: "Commentaire",
+      moderation: "Les commentaires sont publiés après modération.",
+      submit: "Envoyer",
+      sending: "Envoi…",
+      success: "Merci. Votre commentaire est en attente de modération.",
+      error: "Le commentaire n’a pas pu être envoyé. Veuillez réessayer.",
+    },
   },
   "pt-br": {
     nav: {
@@ -196,6 +229,22 @@ export const ui = {
     sourceCode: "Código-fonte",
     filedUnder: "Temas",
     englishOnly: "Este conteúdo ainda está disponível apenas em inglês.",
+    comments: {
+      label: "Discussão",
+      title: "Comentários e sugestões",
+      intro:
+        "Perguntas, correções e sugestões são bem-vindas. Leio cada mensagem antes de publicá-la.",
+      loading: "Carregando comentários…",
+      empty: "Ainda não há comentários. Você pode iniciar a conversa.",
+      unavailable: "Os comentários estão temporariamente indisponíveis.",
+      name: "Nome",
+      message: "Comentário",
+      moderation: "Os comentários são publicados depois da moderação.",
+      submit: "Enviar comentário",
+      sending: "Enviando…",
+      success: "Obrigado. Seu comentário está aguardando moderação.",
+      error: "Não foi possível enviar o comentário. Tente novamente.",
+    },
   },
 } as const;
 

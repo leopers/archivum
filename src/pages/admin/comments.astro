@@ -1,0 +1,141 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export const prerender = true;
+---
+
+<BaseLayout title="Comment moderation — Leonardo Dias">
+  <main class="moderation-page">
+    <header class="page-head moderation-head">
+      <div class="eyebrow">Private</div>
+      <h1>Comment moderation</h1>
+      <p>Review suggestions before they appear on the site.</p>
+    </header>
+
+    <form class="moderation-login" data-moderation-login>
+      <label>
+        <span>Moderator key</span>
+        <input
+          type="password"
+          name="token"
+          autocomplete="current-password"
+          required
+        />
+      </label>
+      <button type="submit">Open moderation</button>
+    </form>
+    <p class="comment-status" data-moderation-status role="status"></p>
+    <nav
+      class="moderation-tabs"
+      data-moderation-tabs
+      hidden
+      aria-label="Comment status"
+    >
+      <button type="button" data-filter="pending" aria-pressed="true"
+        >Pending</button
+      >
+      <button type="button" data-filter="approved" aria-pressed="false"
+        >Published</button
+      >
+      <button type="button" data-filter="rejected" aria-pressed="false"
+        >Rejected</button
+      >
+    </nav>
+    <div class="moderation-list" data-moderation-list hidden></div>
+  </main>
+</BaseLayout>
+
+<script is:inline>
+  const form = document.querySelector("[data-moderation-login]");
+  const status = document.querySelector("[data-moderation-status]");
+  const list = document.querySelector("[data-moderation-list]");
+  const tabs = document.querySelector("[data-moderation-tabs]");
+  let token = "";
+  let currentFilter = "pending";
+
+  const escapeHtml = (value) => {
+    const element = document.createElement("span");
+    element.textContent = value;
+    return element.innerHTML;
+  };
+
+  const loadComments = async (filter = currentFilter) => {
+    currentFilter = filter;
+    status.textContent = "Loading comments…";
+    const response = await fetch(`/api/comments?moderation=${filter}`, {
+      headers: { "x-admin-token": token },
+    });
+    if (!response.ok) {
+      status.textContent = "The moderator key is not valid.";
+      return;
+    }
+    const { comments } = await response.json();
+    form.hidden = true;
+    tabs.hidden = false;
+    list.hidden = false;
+    tabs
+      .querySelectorAll("button")
+      .forEach((button) =>
+        button.setAttribute(
+          "aria-pressed",
+          String(button.dataset.filter === filter),
+        ),
+      );
+    status.textContent = comments.length
+      ? `${comments.length} ${filter === "pending" ? "pending" : filter} comment${comments.length === 1 ? "" : "s"}.`
+      : `No ${filter} comments.`;
+    list.innerHTML = comments
+      .map(
+        (
+          comment,
+        ) => `<article class="moderation-card" data-comment-id="${comment.id}">
+          <header><strong>${escapeHtml(comment.author_name)}</strong><span>${escapeHtml(comment.locale)} · ${escapeHtml(comment.content_key)}</span></header>
+          <p>${escapeHtml(comment.body).replaceAll("\n", "<br>")}</p>
+          <footer>
+            ${filter === "pending" ? '<button data-action="approved">Approve</button><button class="secondary" data-action="rejected">Reject</button>' : ""}
+            ${filter === "rejected" ? '<button data-action="approved">Restore & publish</button>' : ""}
+            <button class="danger" data-action="delete">Delete permanently</button>
+          </footer>
+        </article>`,
+      )
+      .join("");
+  };
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    token = new FormData(form).get("token")?.toString() || "";
+    loadComments("pending");
+  });
+
+  tabs.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-filter]");
+    if (button) loadComments(button.dataset.filter);
+  });
+
+  list.addEventListener("click", async (event) => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    const card = button.closest("[data-comment-id]");
+    const deleting = button.dataset.action === "delete";
+    if (
+      deleting &&
+      !window.confirm("Delete this comment permanently? This cannot be undone.")
+    )
+      return;
+    button.disabled = true;
+    const response = await fetch("/api/comments", {
+      method: "PATCH",
+      headers: { "content-type": "application/json", "x-admin-token": token },
+      body: JSON.stringify({
+        id: card.dataset.commentId,
+        ...(deleting
+          ? { action: "delete" }
+          : { status: button.dataset.action }),
+      }),
+    });
+    if (response.ok) {
+      card.remove();
+      loadComments(currentFilter);
+    } else button.disabled = false;
+  });
+</script>

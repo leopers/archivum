@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import CommentsSection from "../components/CommentsSection.astro";
 import { localePath, ui, type Locale } from "../i18n/ui";
 const { data, locale = "en", englishOnly = false } = Astro.props;
 const t = ui[locale as Locale];
@@ -12,6 +13,8 @@ const date = data.published
       year: "numeric",
     })
   : String(data.year);
+const articlePath = Astro.url.pathname.replace(/^\/(fr|pt-br)/, "");
+const commentable = /^\/(writing|projects)\//.test(articlePath);
 ---
 
 <BaseLayout
@@ -21,15 +24,17 @@ const date = data.published
   ><div class="article-wrap">
     <article>
       <header class="article-head">
-        {!data.published && <div class="eyebrow">{t.project}</div>}<h1
-          >{data.title}</h1
-        ><div class="article-sub">
+        {!data.published && <div class="eyebrow">{t.project}</div>}<h1>
+          {data.title}
+        </h1><div class="article-sub">
           {data.description}
         </div><div class="article-meta">
           <span>{date} · {data.topics.join(" / ")}</span>
-          {data.status === "under-construction" && (
-            <span class="construction-label">{t.underConstruction}</span>
-          )}
+          {
+            data.status === "under-construction" && (
+              <span class="construction-label">{t.underConstruction}</span>
+            )
+          }
         </div>
         {
           data.repo && (
@@ -45,7 +50,9 @@ const date = data.published
         }
       </header>{
         englishOnly && <p class="translation-note">{t.englishOnly}</p>
-      }<div class="prose"><slot /></div>
+      }<div class="prose"><slot /></div>{
+        commentable && <CommentsSection locale={locale} />
+      }
     </article><aside class="aside">
       <div class="eyebrow">{t.filedUnder}</div>{
         data.topics.map((topic: string) => (
