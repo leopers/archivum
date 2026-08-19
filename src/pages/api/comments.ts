@@ -28,13 +28,18 @@ export const GET: APIRoute = async ({ request, url }) => {
     await ensureCommentsSchema(db);
     const admin = isAdminToken(request.headers.get("x-admin-token"));
 
-    if (admin && url.searchParams.get("moderation") === "pending") {
+    const moderation = url.searchParams.get("moderation");
+    if (
+      admin &&
+      ["pending", "approved", "rejected"].includes(moderation ?? "")
+    ) {
       const rows = await db
         .prepare(
           `SELECT id, content_key, locale, author_name, body, status, created_at
-           FROM comments WHERE status = 'pending'
+           FROM comments WHERE status = ?
            ORDER BY created_at ASC LIMIT 100`,
         )
+        .bind(moderation)
         .all<CommentRecord>();
       return json({ comments: rows.results ?? [] });
     }
@@ -136,7 +141,7 @@ export const PATCH: APIRoute = async ({ request }) => {
     await db
       .prepare(
         `UPDATE comments SET status = ?, reviewed_at = CURRENT_TIMESTAMP
-         WHERE id = ? AND status = 'pending'`,
+         WHERE id = ?`,
       )
       .bind(status, id)
       .run();
@@ -144,5 +149,23 @@ export const PATCH: APIRoute = async ({ request }) => {
   } catch (error) {
     console.error("comments:patch", error);
     return json({ error: "The moderation action failed." }, 500);
+  }
+};
+
+export const DELETE: APIRoute = async ({ request }) => {
+  try {
+    if (!isAdminToken(request.headers.get("x-admin-token")))
+      return json({ error: "Unauthorized." }, 401);
+    const payload = (await request.json()) as Record<string, unknown>;
+    const id = String(payload.id ?? "").trim();
+    if (!id) return json({ error: "A comment id is required." }, 400);
+
+    const db = getCommentsDb();
+    await ensureCommentsSchema(db);
+    await db.prepare("DELETE FROM comments WHERE id = ?").bind(id).run();
+    return json({ ok: true });
+  } catch (error) {
+    console.error("comments:delete", error);
+    return json({ error: "The comment could not be deleted." }, 500);
   }
 };

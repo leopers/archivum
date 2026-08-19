@@ -895,6 +895,28 @@ h3 {
 .moderation-list {
   margin-top: 28px;
 }
+.moderation-tabs {
+  display: flex;
+  gap: 22px;
+  margin-top: 34px;
+  border-bottom: 1px solid var(--line);
+}
+.moderation-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 11px 0;
+  background: transparent;
+  color: var(--muted);
+  font:
+    0.75rem system-ui,
+    sans-serif;
+  cursor: pointer;
+}
+.moderation-tabs button[aria-pressed="true"] {
+  border-color: var(--violet);
+  color: var(--ink);
+}
 .moderation-card {
   padding: 22px 0;
   border-top: 1px solid var(--line);
@@ -922,6 +944,17 @@ h3 {
   border-color: var(--line);
   background: transparent;
   color: var(--muted);
+}
+.moderation-card button.danger {
+  margin-left: auto;
+  border-color: color-mix(in srgb, #9a3f3f 45%, var(--line));
+  background: transparent;
+  color: #9a3f3f;
+}
+.moderation-card button.danger:hover {
+  border-color: #9a3f3f;
+  background: #9a3f3f;
+  color: var(--paper);
 }
 .site-footer {
   border-top: 1px solid var(--line);
@@ -968,6 +1001,16 @@ h3 {
     align-items: flex-start;
     flex-direction: column;
     gap: 4px;
+  }
+  .moderation-tabs {
+    gap: 16px;
+    overflow-x: auto;
+  }
+  .moderation-card footer {
+    flex-wrap: wrap;
+  }
+  .moderation-card button.danger {
+    margin-left: 0;
   }
   .prose .katex-display {
     margin: 1.2rem 0;
