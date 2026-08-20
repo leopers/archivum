@@ -85,6 +85,15 @@ export const ui = {
       sending: "Sending…",
       success: "Thank you. Your comment is awaiting moderation.",
       error: "Your comment could not be sent. Please try again.",
+      translatedFrom: "Translated from",
+      viewOriginal: "View original",
+      viewTranslation: "View translation",
+      languageNames: {
+        en: "English",
+        fr: "French",
+        "pt-br": "Portuguese",
+        other: "another language",
+      },
     },
   },
   fr: {
@@ -165,6 +174,15 @@ export const ui = {
       sending: "Envoi…",
       success: "Merci. Votre commentaire est en attente de modération.",
       error: "Le commentaire n’a pas pu être envoyé. Veuillez réessayer.",
+      translatedFrom: "Traduit depuis",
+      viewOriginal: "Voir l’original",
+      viewTranslation: "Voir la traduction",
+      languageNames: {
+        en: "l’anglais",
+        fr: "le français",
+        "pt-br": "le portugais",
+        other: "une autre langue",
+      },
     },
   },
   "pt-br": {
@@ -244,6 +262,15 @@ export const ui = {
       sending: "Enviando…",
       success: "Obrigado. Seu comentário está aguardando moderação.",
       error: "Não foi possível enviar o comentário. Tente novamente.",
+      translatedFrom: "Traduzido do",
+      viewOriginal: "Ver original",
+      viewTranslation: "Ver tradução",
+      languageNames: {
+        en: "inglês",
+        fr: "francês",
+        "pt-br": "português",
+        other: "outro idioma",
+      },
     },
   },
 } as const;

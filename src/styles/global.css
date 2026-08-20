@@ -776,6 +776,7 @@ h3 {
 }
 .comment p {
   margin: 0;
+  white-space: pre-line;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 0.98rem;
   line-height: 1.65;
@@ -787,6 +788,32 @@ h3 {
   padding: 28px;
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--paper-2) 82%, var(--violet-soft));
+}
+
+.comment-translation {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+}
+
+.comment-translation button {
+  appearance: none;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  padding: 0;
+  background: transparent;
+  color: var(--violet);
+  font: inherit;
+  cursor: pointer;
+}
+
+.comment-translation button:hover {
+  color: var(--accent);
 }
 .comment-form label,
 .moderation-login label {
