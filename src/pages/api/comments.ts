@@ -78,7 +78,11 @@ export const GET: APIRoute = async ({ request, url }) => {
       let sourceLocale = comment.detected_locale;
       let translatedBody = comment.translated_body;
 
-      if (!sourceLocale || (!translatedBody && sourceLocale !== locale)) {
+      if (
+        !sourceLocale ||
+        sourceLocale === "other" ||
+        (!translatedBody && sourceLocale !== locale)
+      ) {
         try {
           const translation = await translateComment(
             comment.body,
