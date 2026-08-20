@@ -70,6 +70,20 @@ const normalizedPath = Astro.url.pathname
         { day: "numeric", month: "long", year: "numeric" },
       ).format(new Date(value + (value.endsWith("Z") ? "" : "Z")));
 
+    const displayLocale =
+      locale === "pt-br" ? "pt-BR" : locale === "fr" ? "fr-FR" : "en-GB";
+    const languageDisplay = new Intl.DisplayNames([displayLocale], {
+      type: "language",
+    });
+    const formatLanguage = (value) => {
+      if (!value) return "";
+      try {
+        return languageDisplay.of(value.replace(/^pt-br$/i, "pt-BR")) || value;
+      } catch {
+        return value.toUpperCase();
+      }
+    };
+
     const loadComments = async () => {
       try {
         const response = await fetch(
@@ -89,7 +103,7 @@ const normalizedPath = Astro.url.pathname
               ${
                 comment.translated
                   ? `<footer class="comment-translation">
-                      <span>${escapeHtml(labels.translatedFrom)} ${escapeHtml(labels.languageNames[comment.source_locale] || labels.languageNames.other)}</span>
+                      <span>${escapeHtml(labels.translatedFrom)} ${escapeHtml(formatLanguage(comment.source_locale))}</span>
                       <button type="button" data-toggle-translation
                         data-original="${escapeHtml(comment.original_body)}"
                         data-translation="${escapeHtml(comment.body)}"

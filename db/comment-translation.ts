@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 
-export type CommentLocale = "en" | "fr" | "pt-br" | "other";
+export type CommentLocale = string;
 
 const localeNames: Record<Exclude<CommentLocale, "other">, string> = {
   en: "English",
@@ -38,7 +38,8 @@ export async function translateComment(
             properties: {
               source_language: {
                 type: "string",
-                enum: ["en", "fr", "pt-br", "other"],
+                description:
+                  "The detected language as a valid BCP 47 language tag, such as en, fr, pt-BR, de, or es.",
               },
               translation: { type: "string" },
             },

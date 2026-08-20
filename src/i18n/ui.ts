@@ -88,12 +88,6 @@ export const ui = {
       translatedFrom: "Translated from",
       viewOriginal: "View original",
       viewTranslation: "View translation",
-      languageNames: {
-        en: "English",
-        fr: "French",
-        "pt-br": "Portuguese",
-        other: "another language",
-      },
     },
   },
   fr: {
@@ -177,12 +171,6 @@ export const ui = {
       translatedFrom: "Traduit depuis",
       viewOriginal: "Voir l’original",
       viewTranslation: "Voir la traduction",
-      languageNames: {
-        en: "l’anglais",
-        fr: "le français",
-        "pt-br": "le portugais",
-        other: "une autre langue",
-      },
     },
   },
   "pt-br": {
@@ -265,12 +253,6 @@ export const ui = {
       translatedFrom: "Traduzido do",
       viewOriginal: "Ver original",
       viewTranslation: "Ver tradução",
-      languageNames: {
-        en: "inglês",
-        fr: "francês",
-        "pt-br": "português",
-        other: "outro idioma",
-      },
     },
   },
 } as const;
