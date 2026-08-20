@@ -70,6 +70,20 @@ const normalizedPath = Astro.url.pathname
         { day: "numeric", month: "long", year: "numeric" },
       ).format(new Date(value + (value.endsWith("Z") ? "" : "Z")));
 
+    const displayLocale =
+      locale === "pt-br" ? "pt-BR" : locale === "fr" ? "fr-FR" : "en-GB";
+    const languageDisplay = new Intl.DisplayNames([displayLocale], {
+      type: "language",
+    });
+    const formatLanguage = (value) => {
+      if (!value) return "";
+      try {
+        return languageDisplay.of(value.replace(/^pt-br$/i, "pt-BR")) || value;
+      } catch {
+        return value.toUpperCase();
+      }
+    };
+
     const loadComments = async () => {
       try {
         const response = await fetch(
@@ -85,7 +99,18 @@ const normalizedPath = Astro.url.pathname
           .map(
             (comment) => `<article class="comment">
               <header><strong>${escapeHtml(comment.author_name)}</strong><time>${formatDate(comment.created_at)}</time></header>
-              <p>${escapeHtml(comment.body).replaceAll("\n", "<br>")}</p>
+              <p data-comment-body>${escapeHtml(comment.body).replaceAll("\n", "<br>")}</p>
+              ${
+                comment.translated
+                  ? `<footer class="comment-translation">
+                      <span>${escapeHtml(labels.translatedFrom)} ${escapeHtml(formatLanguage(comment.source_locale))}</span>
+                      <button type="button" data-toggle-translation
+                        data-original="${escapeHtml(comment.original_body)}"
+                        data-translation="${escapeHtml(comment.body)}"
+                        data-showing="translation">${escapeHtml(labels.viewOriginal)}</button>
+                    </footer>`
+                  : ""
+              }
             </article>`,
           )
           .join("");
@@ -93,6 +118,22 @@ const normalizedPath = Astro.url.pathname
         list.innerHTML = `<p class="comments-empty">${escapeHtml(labels.unavailable)}</p>`;
       }
     };
+
+    list.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-toggle-translation]");
+      if (!button) return;
+      const body = button
+        .closest(".comment")
+        .querySelector("[data-comment-body]");
+      const showingTranslation = button.dataset.showing === "translation";
+      body.textContent = showingTranslation
+        ? button.dataset.original
+        : button.dataset.translation;
+      button.dataset.showing = showingTranslation ? "original" : "translation";
+      button.textContent = showingTranslation
+        ? labels.viewTranslation
+        : labels.viewOriginal;
+    });
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();

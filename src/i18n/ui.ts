@@ -85,6 +85,9 @@ export const ui = {
       sending: "Sending…",
       success: "Thank you. Your comment is awaiting moderation.",
       error: "Your comment could not be sent. Please try again.",
+      translatedFrom: "Translated from",
+      viewOriginal: "View original",
+      viewTranslation: "View translation",
     },
   },
   fr: {
@@ -165,6 +168,9 @@ export const ui = {
       sending: "Envoi…",
       success: "Merci. Votre commentaire est en attente de modération.",
       error: "Le commentaire n’a pas pu être envoyé. Veuillez réessayer.",
+      translatedFrom: "Traduit depuis",
+      viewOriginal: "Voir l’original",
+      viewTranslation: "Voir la traduction",
     },
   },
   "pt-br": {
@@ -244,6 +250,9 @@ export const ui = {
       sending: "Enviando…",
       success: "Obrigado. Seu comentário está aguardando moderação.",
       error: "Não foi possível enviar o comentário. Tente novamente.",
+      translatedFrom: "Traduzido do",
+      viewOriginal: "Ver original",
+      viewTranslation: "Ver tradução",
     },
   },
 } as const;

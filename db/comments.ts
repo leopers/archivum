@@ -3,6 +3,8 @@ import {
   createCommentsTable,
   createPublishedCommentsIndex,
   createRateLimitIndex,
+  createCommentLanguagesTable,
+  createCommentTranslationsTable,
 } from "./schema";
 
 type D1Result<T> = { results?: T[] };
@@ -38,6 +40,8 @@ export async function ensureCommentsSchema(db = getCommentsDb()) {
     db.prepare(createCommentsTable),
     db.prepare(createPublishedCommentsIndex),
     db.prepare(createRateLimitIndex),
+    db.prepare(createCommentLanguagesTable),
+    db.prepare(createCommentTranslationsTable),
   ]);
 }
 

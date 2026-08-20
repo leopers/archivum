@@ -6,6 +6,10 @@ import {
   isAdminToken,
   type CommentRecord,
 } from "../../../db/comments";
+import {
+  translateComment,
+  type CommentLocale,
+} from "../../../db/comment-translation";
 
 export const prerender = false;
 
@@ -51,14 +55,82 @@ export const GET: APIRoute = async ({ request, url }) => {
 
     const rows = await db
       .prepare(
-        `SELECT id, author_name, body, created_at
-         FROM comments
-         WHERE content_key = ? AND locale = ? AND status = 'approved'
-         ORDER BY created_at ASC LIMIT 100`,
+        `SELECT c.id, c.author_name, c.body, c.locale, c.created_at,
+                l.detected_locale,
+                t.translated_body
+         FROM comments c
+         LEFT JOIN comment_languages l ON l.comment_id = c.id
+         LEFT JOIN comment_translations t
+           ON t.comment_id = c.id AND t.target_locale = ?
+         WHERE c.content_key = ? AND c.status = 'approved'
+         ORDER BY c.created_at ASC LIMIT 100`,
       )
-      .bind(contentKey, locale)
-      .all<CommentRecord>();
-    return json({ comments: rows.results ?? [] });
+      .bind(locale, contentKey)
+      .all<
+        CommentRecord & {
+          detected_locale: CommentLocale | null;
+          translated_body: string | null;
+        }
+      >();
+
+    const comments = [];
+    for (const comment of rows.results ?? []) {
+      let sourceLocale = comment.detected_locale;
+      let translatedBody = comment.translated_body;
+
+      if (
+        !sourceLocale ||
+        sourceLocale === "other" ||
+        (!translatedBody && sourceLocale !== locale)
+      ) {
+        try {
+          const translation = await translateComment(
+            comment.body,
+            locale as "en" | "fr" | "pt-br",
+          );
+          sourceLocale = translation.source_language;
+          await db
+            .prepare(
+              `INSERT INTO comment_languages (comment_id, detected_locale)
+               VALUES (?, ?)
+               ON CONFLICT(comment_id) DO UPDATE SET detected_locale = excluded.detected_locale`,
+            )
+            .bind(comment.id, sourceLocale)
+            .run();
+          if (sourceLocale !== locale) {
+            translatedBody = translation.translation;
+            await db
+              .prepare(
+                `INSERT INTO comment_translations
+                 (comment_id, target_locale, translated_body)
+                 VALUES (?, ?, ?)
+                 ON CONFLICT(comment_id, target_locale)
+                 DO UPDATE SET translated_body = excluded.translated_body`,
+              )
+              .bind(comment.id, locale, translatedBody)
+              .run();
+          }
+        } catch (error) {
+          console.error("comments:translation", comment.id, error);
+        }
+      }
+
+      comments.push({
+        id: comment.id,
+        author_name: comment.author_name,
+        body:
+          sourceLocale && sourceLocale !== locale && translatedBody
+            ? translatedBody
+            : comment.body,
+        original_body: comment.body,
+        source_locale: sourceLocale ?? comment.locale,
+        translated: Boolean(
+          sourceLocale && sourceLocale !== locale && translatedBody,
+        ),
+        created_at: comment.created_at,
+      });
+    }
+    return json({ comments });
   } catch (error) {
     console.error("comments:get", error);
     return json({ error: "Comments are temporarily unavailable." }, 500);
