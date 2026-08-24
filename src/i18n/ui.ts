@@ -70,6 +70,13 @@ export const ui = {
     sourceCode: "Source code",
     filedUnder: "Filed under",
     englishOnly: "This article is currently available in English.",
+    readingModes: {
+      label: "Reading mode",
+      standard: "Standard",
+      focus: "Focus",
+      wide: "Wide",
+      print: "Print / PDF",
+    },
     comments: {
       label: "Discussion",
       title: "Comments & suggestions",
@@ -152,6 +159,13 @@ export const ui = {
     sourceCode: "Code source",
     filedUnder: "Sujets",
     englishOnly: "Cet article est actuellement disponible en anglais.",
+    readingModes: {
+      label: "Mode de lecture",
+      standard: "Standard",
+      focus: "Concentration",
+      wide: "Large",
+      print: "Imprimer / PDF",
+    },
     comments: {
       label: "Discussion",
       title: "Commentaires et suggestions",
@@ -235,6 +249,13 @@ export const ui = {
     sourceCode: "Código-fonte",
     filedUnder: "Temas",
     englishOnly: "Este conteúdo ainda está disponível apenas em inglês.",
+    readingModes: {
+      label: "Modo de leitura",
+      standard: "Padrão",
+      focus: "Foco",
+      wide: "Amplo",
+      print: "Imprimir / PDF",
+    },
     comments: {
       label: "Discussão",
       title: "Comentários e sugestões",
