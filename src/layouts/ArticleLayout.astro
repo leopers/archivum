@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import CommentsSection from "../components/CommentsSection.astro";
+import ReadingModes from "../components/ReadingModes.astro";
 import { localePath, ui, type Locale } from "../i18n/ui";
 const { data, locale = "en", englishOnly = false } = Astro.props;
 const t = ui[locale as Locale];
@@ -23,6 +24,7 @@ const commentable = /^\/(writing|projects)\//.test(articlePath);
   locale={locale}
   ><div class="article-wrap">
     <article>
+      <ReadingModes locale={locale} />
       <header class="article-head">
         {!data.published && <div class="eyebrow">{t.project}</div>}<h1>
           {data.title}

@@ -1,0 +1,51 @@
+---
+import { ui, type Locale } from "../i18n/ui";
+
+const { locale = "en" } = Astro.props as { locale?: Locale };
+const t = ui[locale].readingModes;
+---
+
+<div class="reading-tools" data-reading-tools aria-label={t.label}>
+  <span class="reading-tools-label">{t.label}</span>
+  <div class="reading-mode-options">
+    <button type="button" data-reading-mode="standard" aria-pressed="true">
+      {t.standard}
+    </button>
+    <button type="button" data-reading-mode="focus" aria-pressed="false">
+      {t.focus}
+    </button>
+    <button type="button" data-reading-mode="wide" aria-pressed="false">
+      {t.wide}
+    </button>
+    <button type="button" data-print-article>{t.print}</button>
+  </div>
+</div>
+
+<script is:inline>
+  const readingTools = document.querySelector("[data-reading-tools]");
+  if (readingTools) {
+    const modes = ["standard", "focus", "wide"];
+    const applyReadingMode = (mode) => {
+      const selected = modes.includes(mode) ? mode : "standard";
+      document.documentElement.dataset.readingMode = selected;
+      localStorage.setItem("readingMode", selected);
+      readingTools.querySelectorAll("[data-reading-mode]").forEach((button) => {
+        button.setAttribute(
+          "aria-pressed",
+          String(button.dataset.readingMode === selected),
+        );
+      });
+    };
+
+    applyReadingMode(
+      document.documentElement.dataset.readingMode ||
+        localStorage.getItem("readingMode"),
+    );
+
+    readingTools.addEventListener("click", (event) => {
+      const modeButton = event.target.closest("[data-reading-mode]");
+      if (modeButton) applyReadingMode(modeButton.dataset.readingMode);
+      if (event.target.closest("[data-print-article]")) window.print();
+    });
+  }
+</script>
